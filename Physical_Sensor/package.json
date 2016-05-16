@@ -1,0 +1,13 @@
+{
+  "name": "Sensor",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "start": "node app.js"
+  },
+  "dependencies": {
+    "ejs": "*",
+    "express": "3.2.6",
+    "node-cron": "^1.1.1"
+  }
+}
