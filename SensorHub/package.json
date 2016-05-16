@@ -8,6 +8,6 @@
   "dependencies": {
     "ejs": "*",
     "express": "3.2.6",
-    "node-cron": "^1.1.1"
+    "node-schedule": "^1.1.0"
   }
 }

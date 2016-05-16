@@ -3,15 +3,11 @@
  */
 
 var sensor_list = [];
-var sensor = {};
 var counter=0;
 var sensor_data = require("./sensor_data");
 
 var schedule = require('node-schedule');
 
-function create_sensor(sensor_params){
-	
-}
 
 function destroy_sensor(sensor_id){
 	for (var i=0, len = sensor_list.length; i<len; i++){

@@ -2,6 +2,7 @@
  * http://usejsdoc.org/
  */
 var http = require('http');
+var schedule = require('node-schedule');
 
 var hub_list = [];
 
@@ -190,3 +191,70 @@ exports.view_sensors = function(req, res){
 		}
 	}	
 };
+
+exports.get_data = function(req, res){
+	var sensor_id = req.body.sensor_id;
+	var hub_id = req.body.hub_id;
+	
+	for(var i=0, len=hub_list.length; i<len; i++){
+		var hub = hub_list[i];
+		if(hub.id === hub_id){
+			for(var j=0, sensor_list_len=hub.sensors.length; j<sensor_list_len; j++){
+				var sensor = hub.sensors[j];
+				if(sensor.id === sensor_id){
+					res.send({result:"success", data : sensor.data});
+					break;
+				}
+			}
+			break;
+		}
+	}
+};
+
+
+var rule = new schedule.RecurrenceRule();
+rule.minute = [9,19,29,39,49,59];
+ 
+var j = schedule.scheduleJob(rule, function(){
+	for(var i=0, len=hub_list.length; i<len; i++){
+		var hub = hub_list[i];
+		for(var j=0, sensor_list_len=hub.sensors.length; j<sensor_list_len; j++){
+			var sensor = hub.sensors[j];
+			
+			var options = {
+					host: sensor.sensor_host,
+					port: sensor.sensor_port,
+					path: '/get-data',
+					method: 'POST',
+					headers: {
+					      'Content-Type': 'application/json',
+					}
+			};
+			
+			var request = http.request(options, function(response){
+				
+				var str = '';
+				response.on('data', function (chunk) {
+				   str += chunk;
+				});				
+				
+				response.on('end', function() {
+					str = JSON.parse(str);
+				    if(str && str.result ==="success"){
+				    	sensor.data = str.data;						
+					}
+				  });				
+			});
+			
+
+			request.on('error', function(e) {
+				  console.log('problem with request: ' + e.message);
+			});
+			
+			var data = {};
+			data.sensor_id = sensor.id;
+			request.write(JSON.stringify(data));
+			request.end();
+		}		
+	}
+});
