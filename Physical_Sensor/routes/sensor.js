@@ -11,7 +11,7 @@ var cron = require('node-cron');
 function create_sensor(sensor_params){
 	var sensor = {};
 	sensor.id = sensor_params.sensor_id;
-	sensor.pollutant = sensor_params.pollutant;
+	sensor.name = sensor_params.name;
 	sensor.hub_host = sensor_params.hub_host;
 	sensor.sensor_host = sensor_params.sensor_host;
 	sensor.state = "Running";

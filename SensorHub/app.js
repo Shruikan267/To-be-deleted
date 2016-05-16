@@ -4,7 +4,7 @@
  */
 
 var express = require('express')
-  , user = require('./routes/sensor_hub')
+  , hub = require('./routes/hub')
   , http = require('http')
   , path = require('path');
 
@@ -26,6 +26,13 @@ if ('development' == app.get('env')) {
   app.use(express.errorHandler());
 }
 
+app.post('/create',hub.create_api);
+app.post('/add-sensor',hub.create_api);
+app.post('/delete-sensor',hub.create_api);
+app.post('/delete',hub.create_api);
+
+app.post('/view-hubs',hub.view_hubs);
+app.post('/view-sensors',hub.view_sensors);
 
 http.createServer(app).listen(app.get('port'), function(){
   console.log('Express server listening on port ' + app.get('port'));
