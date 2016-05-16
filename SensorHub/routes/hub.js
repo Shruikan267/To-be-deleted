@@ -6,12 +6,16 @@ var http = require('http');
 var hub_list = [];
 
 exports.create_hub = function(req, res){
+	
 	var hub_params = req.body.hub_params;
+	console.log(req.body);
+	console.log(hub_params);
 	var hub = {};
 	hub.id = hub_params.id;
-	hub.name = hub.params.name;
+	hub.name = hub_params.name;
 	hub.host = hub_params.host;
 	hub.sensors = [];
+	console.log(hub);
 	hub_list.push(hub);
 	
 	res.send({result : "success"});
@@ -119,13 +123,15 @@ exports.view_hubs = function(req, res){
 		console.log('Id: '+hub_list[i].id);
 		console.log('Name: '+hub_list[i].name);
 		console.log('Host: '+hub_list[i].host);
-		console.log('Sensors: '+hub_list[i].host);
+		console.log('Sensors: '+hub_list[i].sensors);
 		console.log('\n');
 	}
+	res.send( {hubs : hub_list});
 };
 
 exports.view_sensors = function(req, res){
 	var hub_id = req.body.hub_id;
+	console.log(hub_id);
 	for(var i=0, len=hub_list.length; i<len; i++){
 		if(hub_list[i].id === hub_id){
 			for(var j=0, sensor_list_len=hub_list[i].sensors.length; j<sensor_list_len; j++){
@@ -137,7 +143,8 @@ exports.view_sensors = function(req, res){
 				console.log('State: '+sensor.state);
 				console.log('\n');
 			}
-			break;
+			res.send( {sensors : hub_list[i].sensors});
+			break;			
 		}
-	}
+	}	
 };

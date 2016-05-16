@@ -35,7 +35,8 @@ exports.get_all_pollutants_by_sensor_id = function(pollutant, id){
 
 
 /* Change values in the data set. Replace by API calls to get value from the AirNow API */
-var task = cron.schedule('* */10 * * * *', function() {
+var task = cron.schedule('* */5 * * * *', function() {
+	console.log("Running data-set cron");
 	if(counter % 3 === 0){
 		for(var i=0;i<15;i++){
 			ozone[i] = ozone[i]-1;
@@ -44,7 +45,6 @@ var task = cron.schedule('* */10 * * * *', function() {
 			so2[i] = so2[i]-1;
 			n2o[i] = n2o[i]-1;
 		}
-		console.log(ozone);
 	}else if(counter % 3 === 1){
 		for(var i=0;i<15;i++){
 			ozone[i] = ozone[i]+2;
@@ -53,7 +53,6 @@ var task = cron.schedule('* */10 * * * *', function() {
 			so2[i] = so2[i]+2;
 			n2o[i] = n2o[i]+2;
 		}
-		console.log(ozone);
 	}else if(counter % 3 === 2){
 		for(var i=0;i<15;i++){
 			ozone[i] = ozone[i]-1;
@@ -62,7 +61,6 @@ var task = cron.schedule('* */10 * * * *', function() {
 			so2[i] = so2[i]-1;
 			n2o[i] = n2o[i]-1;
 		}
-		console.log(ozone);
 	}
 	counter++;
-}, true);
+}, false);

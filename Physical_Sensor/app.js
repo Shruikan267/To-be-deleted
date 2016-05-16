@@ -5,6 +5,7 @@
 
 var express = require('express')
   , sensor = require('./routes/sensor')
+  , sensor_data = require('./routes/sensor_data')
   , http = require('http')
   , sensor_data = require('./routes/sensor_data')
   , path = require('path');
@@ -29,6 +30,7 @@ if ('development' === app.get('env')) {
 app.post('/create',sensor.create_api);
 app.post('/delete',sensor.delete_api);
 app.post('/get-data',sensor.get_data);
+app.post('/view-sensors',sensor.view_sensors);
 //app.get('/get-sensor-data', sensor.get_data);
 
 http.createServer(app).listen(app.get('port'), function(){

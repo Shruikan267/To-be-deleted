@@ -26,10 +26,10 @@ if ('development' == app.get('env')) {
   app.use(express.errorHandler());
 }
 
-app.post('/create',hub.create_api);
-app.post('/add-sensor',hub.create_api);
-app.post('/delete-sensor',hub.create_api);
-app.post('/delete',hub.create_api);
+app.post('/create',hub.create_hub);
+app.post('/add-sensor',hub.add_sensor);
+app.post('/delete-sensor',hub.delete_sensor);
+app.post('/delete',hub.delete_hub);
 
 app.post('/view-hubs',hub.view_hubs);
 app.post('/view-sensors',hub.view_sensors);

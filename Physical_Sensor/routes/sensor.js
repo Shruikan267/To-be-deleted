@@ -33,6 +33,7 @@ function destroy_sensor(sensor_id){
 
 var task = cron.schedule('* */15 * * * *', function() {
 	for (var i=0, len = sensor_list.length; i<len; i++){
+		console.log('getting data');
 		sensor_list[i].data = sensor_data.get_all_pollutants_by_sensor_id(sensor_list[i].data_id);
 	}
 }, true);
@@ -58,4 +59,21 @@ exports.get_data = function(req, res){
 		}
 	}
 	res.send({result : "success", data : sensor_data});
+};
+
+
+exports.view_sensors = function(req, res){	
+	/*
+	 for(var j=0, sensor_list_len=sensor_list.length; j<sensor_list_len; j++){
+		var sensor = sensor_list[j];
+		console.log('\n');
+		console.log('Id: '+sensor.id);
+		console.log('Name: '+sensor.name);
+		console.log('Host: '+sensor.sensor_host);
+		console.log('State: '+sensor.state);
+		console.log('\n');
+	}
+	*/
+	
+	res.send({sensors:sensor_list});
 };
