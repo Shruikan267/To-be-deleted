@@ -8,14 +8,12 @@ var hub_list = [];
 exports.create_hub = function(req, res){
 	
 	var hub_params = req.body.hub_params;
-	console.log(req.body);
-	console.log(hub_params);
 	var hub = {};
 	hub.id = hub_params.id;
 	hub.name = hub_params.name;
 	hub.host = hub_params.host;
+	hub.port = hub_params.port;
 	hub.sensors = [];
-	console.log(hub);
 	hub_list.push(hub);
 	
 	res.send({result : "success"});
@@ -30,24 +28,45 @@ exports.add_sensor = function(req, res){
 	sensor.id = sensor_params.sensor_id;
 	sensor.name = sensor_params.name;
 	sensor.hub_host = sensor_params.hub_host;
+	sensor.hub_port = sensor_params.hub_port;	
 	sensor.sensor_host = sensor_params.sensor_host;
+	sensor.sensor_port = sensor_params.sensor_port;
 	sensor.state = "Running";
+	
 	sensor.delete_sensor = function(callback){
+		console.log("inside delete function");
 		var options = {
 				host: sensor.sensor_host,
+				port: sensor.sensor_port,
 				path: '/delete',
 				method: 'POST',
-				sensor_id: sensor.id
+				headers: {
+				      'Content-Type': 'application/json',
+			  }
 		};
+		var data = {};
+		console.log(sensor.id);
+		console.log(this);
+		data.sensor_id = sensor.id;
 		
 		var request = http.request(options, function(response){
-			if(response.result && response.result ==="success"){
-				callback({result : "success"});
-			}
+			
+			var str = '';
+			response.on('data', function (chunk) {
+			   str += chunk;
+			});				
+			
+			response.on('end', function() {
+				str = JSON.parse(str);
+			    if(str && str.result ==="success"){
+			    	console.log("Physical sensor deleted!");
+					callback();
+				}
+			});	
+			
 		});
-		
+		request.write(JSON.stringify(data));
 		request.end();
-		
 	};
 	
 	for(var i=0, len=hub_list.length; i<len; i++){
@@ -55,18 +74,39 @@ exports.add_sensor = function(req, res){
 			
 			var options = {
 					host: sensor.sensor_host,
+					port: sensor.sensor_port,
 					path: '/create',
 					method: 'POST',
-					data: sensor_params
+					headers: {
+					      'Content-Type': 'application/json',
+					  }
 			};
 			
 			var request = http.request(options, function(response){
-				if(response.result && response.result ==="success"){
-					hub_list[i].sensors.push(sensor);
-					res.send({result : "success"});
-				}
+				
+				var str = '';
+				response.on('data', function (chunk) {
+				   str += chunk;
+				});				
+				
+				response.on('end', function() {
+					str = JSON.parse(str);
+				    if(str && str.result ==="success"){
+				    	sensor.data = str.data;
+						hub_list[i].sensors.push(sensor);
+						res.send({result : "success"});
+					}
+				  });				
 			});
 			
+
+			request.on('error', function(e) {
+				  console.log('problem with request: ' + e.message);
+			});
+			
+			var data = {};
+			data.sensor_params = sensor_params;
+			request.write(JSON.stringify(data));
 			request.end();
 			break;
 		}
@@ -77,16 +117,18 @@ exports.delete_sensor = function(req, res){
 	var hub_id = req.body.hub_id;
 	var sensor_id = req.body.sensor_id;
 	
-	var callback = function(hub_index, sensor_index){
-			hub_list[hub_index].sensors.splice(sensor_index,1);
-			res.send({result : "success"});		
-	};
-	
 	for(var i=0, len=hub_list.length; i<len; i++){
 		if(hub_list[i].id === hub_id){
 			for(var j=0, sensor_list_len=hub_list[i].sensors.length; j<sensor_list_len; j++){
 				if(hub_list[i].sensors[j].id === sensor_id){
-					hub_list[i].sensors[j].delete_sensor(callback(i, j));
+					
+					var callback = function(){
+						console.log("inside callback");
+						hub_list[i].sensors.splice(j,1);
+						res.send({result : "success"});		
+					};
+					
+					hub_list[i].sensors[j].delete_sensor(callback);
 					break;
 				}				
 			}
@@ -99,18 +141,19 @@ exports.delete_hub = function(req, res){
 	var hub_id = req.body.hub_id;
 	var deleted_count=0;
 	
-	var callback = function(index, length){
-		deleted_count++;
-		if(deleted_count===length){
-			hub_list.splice(index,1);
-			res.send({result : "success"});
-		}
-	};
-	
 	for(var i=0, len=hub_list.length; i<len; i++){
 		if(hub_list[i].id === hub_id){
 			for(var j=0, sensor_list_len=hub_list[i].sensors.length; j<sensor_list_len; j++){
-				hub_list[i].sensors[j].delete_sensor(callback(i,sensor_list_len));
+				
+				var callback = function(){
+					deleted_count++;
+					if(deleted_count===sensor_list_len){
+						hub_list.splice(i,1);
+						res.send({result : "success"});
+					}
+				};
+				
+				hub_list[i].sensors[j].delete_sensor(callback);
 			}
 			break;
 		}
@@ -118,31 +161,30 @@ exports.delete_hub = function(req, res){
 };
 
 exports.view_hubs = function(req, res){
-	for(var i=0, len=hub_list.length; i<len; i++){
-		console.log('\n');
-		console.log('Id: '+hub_list[i].id);
-		console.log('Name: '+hub_list[i].name);
-		console.log('Host: '+hub_list[i].host);
-		console.log('Sensors: '+hub_list[i].sensors);
-		console.log('\n');
-	}
+//	for(var i=0, len=hub_list.length; i<len; i++){
+//		console.log('\n');
+//		console.log('Id: '+hub_list[i].id);
+//		console.log('Name: '+hub_list[i].name);
+//		console.log('Host: '+hub_list[i].host);
+//		console.log('Sensors: '+hub_list[i].sensors);
+//		console.log('\n');
+//	}
 	res.send( {hubs : hub_list});
 };
 
 exports.view_sensors = function(req, res){
 	var hub_id = req.body.hub_id;
-	console.log(hub_id);
 	for(var i=0, len=hub_list.length; i<len; i++){
 		if(hub_list[i].id === hub_id){
-			for(var j=0, sensor_list_len=hub_list[i].sensors.length; j<sensor_list_len; j++){
-				var sensor = hub_list[i].sensors[j];
-				console.log('\n');
-				console.log('Id: '+sensor.id);
-				console.log('Name: '+sensor.name);
-				console.log('Host: '+sensor.sensor_host);
-				console.log('State: '+sensor.state);
-				console.log('\n');
-			}
+//			for(var j=0, sensor_list_len=hub_list[i].sensors.length; j<sensor_list_len; j++){
+//				var sensor = hub_list[i].sensors[j];
+//				console.log('\n');
+//				console.log('Id: '+sensor.id);
+//				console.log('Name: '+sensor.name);
+//				console.log('Host: '+sensor.sensor_host);
+//				console.log('State: '+sensor.state);
+//				console.log('\n');
+//			}
 			res.send( {sensors : hub_list[i].sensors});
 			break;			
 		}

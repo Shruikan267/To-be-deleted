@@ -1,4 +1,4 @@
-var cron = require('node-cron');
+var schedule = require('node-schedule');
 
 var ozone = [115,110,108,107,102,101,104,101,96,96,100,104,102,99,101];
 var ppm = [88,86,83,82,80,84,79,74,74,79,80,83,86,91,93];
@@ -23,7 +23,7 @@ exports.get_pollutant_by_sensor_id = function(pollutant, id){
 	}
 };
 
-exports.get_all_pollutants_by_sensor_id = function(pollutant, id){
+exports.get_all_pollutants_by_sensor_id = function(id){
 	var data = {};
 	data.ozone = ozone[id];
 	data.ppm = ppm[id];
@@ -33,11 +33,11 @@ exports.get_all_pollutants_by_sensor_id = function(pollutant, id){
 	return data;
 };
 
-
-/* Change values in the data set. Replace by API calls to get value from the AirNow API */
-var task = cron.schedule('* */5 * * * *', function() {
-	console.log("Running data-set cron");
-	if(counter % 3 === 0){
+var rule = new schedule.RecurrenceRule();
+rule.minute = [8,16,24,32,40,48,56];
+ 
+var j = schedule.scheduleJob(rule, function(){
+	if(counter % 6 === 0){
 		for(var i=0;i<15;i++){
 			ozone[i] = ozone[i]-1;
 			ppm[i] = ppm[i]-1;
@@ -45,7 +45,7 @@ var task = cron.schedule('* */5 * * * *', function() {
 			so2[i] = so2[i]-1;
 			n2o[i] = n2o[i]-1;
 		}
-	}else if(counter % 3 === 1){
+	}else if(counter % 6 === 3){
 		for(var i=0;i<15;i++){
 			ozone[i] = ozone[i]+2;
 			ppm[i] = ppm[i]+2;
@@ -53,7 +53,7 @@ var task = cron.schedule('* */5 * * * *', function() {
 			so2[i] = so2[i]+2;
 			n2o[i] = n2o[i]+2;
 		}
-	}else if(counter % 3 === 2){
+	}else if(counter % 3 === 5){
 		for(var i=0;i<15;i++){
 			ozone[i] = ozone[i]-1;
 			ppm[i] = ppm[i]-1;
@@ -63,4 +63,36 @@ var task = cron.schedule('* */5 * * * *', function() {
 		}
 	}
 	counter++;
-}, false);
+});
+
+
+/* Change values in the data set. Replace by API calls to get value from the AirNow API */
+//var task = cron.schedule('* */5 * * * *', function() {
+//	console.log("Running data-set cron");
+//	if(counter % 3 === 0){
+//		for(var i=0;i<15;i++){
+//			ozone[i] = ozone[i]-1;
+//			ppm[i] = ppm[i]-1;
+//			co[i] = co[i]-1;
+//			so2[i] = so2[i]-1;
+//			n2o[i] = n2o[i]-1;
+//		}
+//	}else if(counter % 3 === 1){
+//		for(var i=0;i<15;i++){
+//			ozone[i] = ozone[i]+2;
+//			ppm[i] = ppm[i]+2;
+//			co[i] = co[i]+2;
+//			so2[i] = so2[i]+2;
+//			n2o[i] = n2o[i]+2;
+//		}
+//	}else if(counter % 3 === 2){
+//		for(var i=0;i<15;i++){
+//			ozone[i] = ozone[i]-1;
+//			ppm[i] = ppm[i]-1;
+//			co[i] = co[i]-1;
+//			so2[i] = so2[i]-1;
+//			n2o[i] = n2o[i]-1;
+//		}
+//	}
+//	counter++;
+//}, false);
