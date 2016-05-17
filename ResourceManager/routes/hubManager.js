@@ -3,16 +3,14 @@ var mysql = require('./mysql');
 
 var pSensor_host = "localhost";
 var pSensor_port = 3000;
-
+var myTimeout= 5000;
 var hub_host = "localhost";
 var hub_port = 3001;
 
 function getHubId(callback){
 	var sqlQuery = "select max(hub_id) as hub_id from sensorcloud.hubs;";
 	mysql.executeQuery(sqlQuery, function(err, rows){
-		if(!err){
-			console.log(rows);
-			
+		if(!err){			
 			var row;
 			if(rows.length){
 				if(rows.length>0){
@@ -39,7 +37,6 @@ function getPhysicalSensorId(callback){
 	
 	mysql.executeQuery(sqlQuery, function(err, rows){
 		if(!err){
-			console.log(rows);
 			var row;
 			if(rows.length){
 				if(rows.length>0){
@@ -50,7 +47,7 @@ function getPhysicalSensorId(callback){
 			}else{
 				row = rows;
 			}
-			
+			console.log(row);
 			if(!row.sensor_id || row.sensor_id === null){
 				row.sensor_id = 0;
 			}
@@ -61,7 +58,7 @@ function getPhysicalSensorId(callback){
 	});
 }
 
-function createHubQueryBuilder(id, name, user_id , host, port){
+function createHubQueryBuilder(id, name, user_id , host, port, callback){
 	var sqlQuery = "insert into sensorcloud.hubs (hub_id, hub_name, hub_user_id, hub_host, hub_port) values ("+
 	id+",'"+
 	name+"',"+
@@ -69,7 +66,7 @@ function createHubQueryBuilder(id, name, user_id , host, port){
 	host+"',"+
 	port+");";
 	console.log("Query : "+sqlQuery);
-	return sqlQuery;
+	callback(sqlQuery);
 }
 
 exports.createHub = function(req, res){
@@ -110,14 +107,14 @@ exports.createHub = function(req, res){
 				response.on('end', function() {
 					str = JSON.parse(str);
 				    if(str && str.status ==="success"){
-				    	var sqlQuery = 	createHubQueryBuilder(hub_id, hub_name, user_id, host, port);    	
-				    	
-				    	mysql.executeQuery(sqlQuery, function(err, rows){
-				    		if(!err){
-				    			res.send({status : "success"});
-				    		}else{
-				    			res.send({status : "failed"});
-				    		}
+				    	createHubQueryBuilder(hub_id, hub_name, user_id, host, port, function(sqlQuery){
+					    	mysql.executeQuery(sqlQuery, function(err, rows){
+					    		if(!err){
+					    			res.send({status : "success"});
+					    		}else{
+					    			res.send({status : "failed"});
+					    		}
+					    	});
 				    	});
 					}else{
 						res.send({status : "failed"});
@@ -125,6 +122,22 @@ exports.createHub = function(req, res){
 				});	
 				
 			});
+			
+			request.on('socket', function (socket) {
+			    socket.setTimeout(myTimeout);  
+			    socket.on('timeout', function() {
+			    	res.send({status : "failed"});
+			    	request.abort();
+			    });
+			});
+
+			request.on('error', function(err) {
+			    if (err.code === "ECONNRESET") {
+			        console.log("Timeout occurs");
+			        //specific error treatment
+			    }		    
+			});
+			
 			request.write(JSON.stringify(data));
 			request.end();
 			
@@ -135,8 +148,8 @@ exports.createHub = function(req, res){
 };
 
 
-function createSensorQueryBuilder(id, name, hub_id, host, port, hub_host, hub_port){
-	var sqlQuery = "insert into sensorcloud.hubs values ("+
+function createSensorQueryBuilder(id, name, hub_id, host, port, hub_host, hub_port, user_id, callback){
+	var sqlQuery = "insert into sensorcloud.physical_sensors values ("+
 	id+",'"+
 	name+"',"+
 	hub_id+",'"+
@@ -144,10 +157,11 @@ function createSensorQueryBuilder(id, name, hub_id, host, port, hub_host, hub_po
 	port+",'"+
 	hub_host+"',"+
 	hub_port+","+
-	"'Running'"+
+	"'Running',"+
+	user_id+""+
 	");";
 	console.log("Query : "+sqlQuery);
-	return sqlQuery;
+	callback(sqlQuery);
 }
 
 exports.createSensor = function(req, res){
@@ -157,15 +171,13 @@ exports.createSensor = function(req, res){
 			var user_id = req.body.user_id;
 			var hub_id = req.body.hub_id;
 			var sensor_id = result.sensor_id+1;
-			var hub_host = hub_host;
-			var hub_port = hub_port;
 			var sensor_host = pSensor_host;
 			var sensor_port = pSensor_port;
 			
 			var data = {
 					hub_id : hub_id,
 					sensor_params : {
-						sensor_id : hub_id,
+						sensor_id : sensor_id,
 						name : sensor_name,
 						hub_host : hub_host,
 						hub_port : hub_port,
@@ -184,7 +196,6 @@ exports.createSensor = function(req, res){
 				  }
 			};
 			
-			
 			var request = http.request(options, function(response){
 				
 				var str = '';
@@ -195,20 +206,38 @@ exports.createSensor = function(req, res){
 				response.on('end', function() {
 					str = JSON.parse(str);
 				    if(str && str.status ==="success"){
-				    	var sqlQuery = 	createSensorQueryBuilder(sensor_id, sensor_name, hub_id, sensor_host, sensor_port, hub_host, hub_port);
-				    	mysql.executeQuery(sqlQuery, function(err, rows){
-				    		if(!err){
-				    			res.send({status : "success"});
-				    		}else{
-				    			res.send({status : "failed"});
-				    		}
+				    	createSensorQueryBuilder(sensor_id, sensor_name, hub_id, sensor_host, sensor_port, hub_host, hub_port, user_id, function(sqlQuery){
+				    		mysql.executeQuery(sqlQuery, function(err, rows){
+					    		if(!err){
+					    			res.send({status : "success"});
+					    		}else{
+					    			res.send({status : "failed"});
+					    		}
+					    	});
 				    	});
+				    	
 					}else{
 						res.send({status : "failed"});
 					}
 				});	
 				
 			});
+			
+			request.on('socket', function (socket) {
+			    socket.setTimeout(myTimeout);  
+			    socket.on('timeout', function() {
+			    	res.send({status : "failed"});
+			    	request.abort();
+			    });
+			});
+
+			request.on('error', function(err) {
+			    if (err.code === "ECONNRESET") {
+			        console.log("Timeout occurs");
+			        //specific error treatment
+			    }		    
+			});
+			
 			request.write(JSON.stringify(data));
 			request.end();			
 			
@@ -321,6 +350,22 @@ exports.deleteHub = function(req, res){
 				});	
 				
 			});
+			
+			request.on('socket', function (socket) {
+			    socket.setTimeout(myTimeout);  
+			    socket.on('timeout', function() {
+			    	res.send({status : "failed"});
+			    	request.abort();
+			    });
+			});
+
+			request.on('error', function(err) {
+			    if (err.code === "ECONNRESET") {
+			        console.log("Timeout occurs");
+			        //specific error treatment
+			    }		    
+			});
+			
 			request.write(JSON.stringify(data));
 			request.end();
 			
@@ -376,49 +421,69 @@ exports.deleteSensor = function(req, res){
 	var sensor_id = req.body.sensor_id;
 	getSensorParameters(sensor_id, function(result){
 		if(result.status==="success"){
-			var hub_host = result.sensor_params.hub_host;
-			var hub_port = result.sensor_params.hub_port;
-			
-			var data = {};
-			data.hub_id = hub_id;
-			data.sensor_id = sensor_id;
-			
-			var options = {
-					host: hub_host,
-					port: hub_port,
-					path: '/delete-sensor',
-					method: 'POST',
-					headers: {
-					      'Content-Type': 'application/json',
-				  }
-			};
-			
-			var request = http.request(options, function(response){
+			if(result.sensor_params && result.sensor_params){
+				var hub_host = result.sensor_params.hub_host;
+				var hub_port = result.sensor_params.hub_port;
 				
-				var str = '';
-				response.on('data', function (chunk) {
-				   str += chunk;
-				});				
+				var data = {};
+				data.hub_id = hub_id;
+				data.sensor_id = sensor_id;
 				
-				response.on('end', function() {
-					str = JSON.parse(str);
-				    if(str && str.status ==="success"){
-				    	deleteSensorsFromDb(sensor_id, function(result){
-				    		if(result.status==="success"){
-				    			res.send({status : "success"});
-				    		}else{
-				    			res.send({status : "failed"});
-				    		}
-				    	});
-				    	
-					}else{
-						res.send({status : "failed"});
-					}
-				});	
+				var options = {
+						host: hub_host,
+						port: hub_port,
+						path: '/delete-sensor',
+						method: 'POST',
+						headers: {
+						      'Content-Type': 'application/json',
+					  }
+				};
 				
-			});
-			request.write(JSON.stringify(data));
-			request.end();
+				var request = http.request(options, function(response){
+					
+					var str = '';
+					response.on('data', function (chunk) {
+					   str += chunk;
+					});				
+					
+					response.on('end', function() {
+						str = JSON.parse(str);
+					    if(str && str.status ==="success"){
+					    	deleteSensorsFromDb(sensor_id, function(result){
+					    		if(result.status==="success"){
+					    			res.send({status : "success"});
+					    		}else{
+					    			res.send({status : "failed"});
+					    		}
+					    	});
+					    	
+						}else{
+							res.send({status : "failed"});
+						}
+					});	
+					
+				});
+				
+				request.on('socket', function (socket) {
+				    socket.setTimeout(myTimeout);  
+				    socket.on('timeout', function() {
+				    	res.send({status : "failed"});
+				    	request.abort();
+				    });
+				});
+
+				request.on('error', function(err) {
+				    if (err.code === "ECONNRESET") {
+				        console.log("Timeout occurs");
+				        //specific error treatment
+				    }		    
+				});
+				
+				request.write(JSON.stringify(data));
+				request.end();
+			}else{
+				res.send({status : "failed"});
+			}		
 			
 		}else{
 			res.send({status : "failed"});

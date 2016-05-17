@@ -6,6 +6,7 @@
 var express = require('express')
   , userResoureMgr = require('./routes/userResourceManager')
   , hubManager = require('./routes/hubManager')
+  , vSensorManager = require('./routes/vSensorManager')
   , http = require('http')
   , path = require('path');
 
@@ -39,6 +40,11 @@ app.post('/create-physical-sensor', hubManager.createSensor);
 app.post('/delete-physical-sensor', hubManager.deleteSensor);
 
 /* This section contains APIs for creating, suspending, resuming and terminating virtual sensors */
+app.post('/create-virtual-sensor', vSensorManager.create_sensor);
+app.post('/suspend-virtual-sensor', vSensorManager.suspend_sensor);
+app.post('/resume-virtual-sensor', vSensorManager.resume_sensor);
+app.post('/terminate-virtual-sensor', vSensorManager.terminate_sensor);
+
 
 http.createServer(app).listen(app.get('port'), function(){
   console.log('Express server listening on port ' + app.get('port'));

@@ -1,6 +1,6 @@
 var http = require('http');
 var mysql = require('./mysql');
-
+var myTimeout = 5000;
 var vSensor_id = 1;
 var vSensor_host = "localhost";
 var vSensor_port = 3002;
@@ -34,7 +34,7 @@ function getSensorId(callback){
 
 function getPhysicalSensorDetails(sensor_id, callback){
 	var sqlQuery = "select * from sensorcloud.physical_sensors where sensor_id = "+sensor_id;
-
+	console.log(sqlQuery);
 	mysql.executeQuery(sqlQuery, function(err, rows){
 		if(!err){
 			console.log(rows);
@@ -112,10 +112,11 @@ exports.create_sensor = function(req, res){
 		if(result.status === "success"){
 			
 			var user_id = req.body.user_id;
-			var vSensor_id = result.sensor_id+1;
 			var pSensor_id = req.body.pSensor_id;
 			var sensor_name = req.body.sensor_name;
-			var pollutants = req.body.pollutants;	
+			var pollutants = req.body.pollutants;
+			
+			var vSensor_id = result.sensor_id+1;	
 			
 			getPhysicalSensorDetails(pSensor_id, function(result){
 				if(result.status === "success"){
@@ -174,6 +175,22 @@ exports.create_sensor = function(req, res){
 						});	
 						
 					});
+					
+					request.on('socket', function (socket) {
+					    socket.setTimeout(myTimeout);  
+					    socket.on('timeout', function() {
+					    	res.send({status : "failed"});
+					    	request.abort();
+					    });
+					});
+
+					request.on('error', function(err) {
+					    if (err.code === "ECONNRESET") {
+					        console.log("Timeout occurs");
+					        //specific error treatment
+					    }		    
+					});
+					
 					request.write(JSON.stringify(data));
 					request.end();
 					
@@ -227,8 +244,8 @@ exports.resume_sensor= function(req, res){
 	virtualSensorDetails(vSensor_id, function(result){
 		if(result.status==="success"){
 			var options = {
-					host: result.sensor_details.hub_host,
-					port:  result.sensor_details.hub_port,
+					host: vSensor_host,
+					port:  vSensor_port,
 					path: '/resume',
 					method: 'POST',
 					headers: {
@@ -262,6 +279,22 @@ exports.resume_sensor= function(req, res){
 				});	
 				
 			});
+			
+			request.on('socket', function (socket) {
+			    socket.setTimeout(myTimeout);  
+			    socket.on('timeout', function() {
+			    	res.send({status : "failed"});
+			    	request.abort();
+			    });
+			});
+
+			request.on('error', function(err) {
+			    if (err.code === "ECONNRESET") {
+			        console.log("Timeout occurs");
+			        //specific error treatment
+			    }		    
+			});
+			
 			request.write(JSON.stringify(data));
 			request.end();	
 			
@@ -279,9 +312,10 @@ exports.suspend_sensor= function(req, res){
 	
 	virtualSensorDetails(vSensor_id, function(result){
 		if(result.status==="success"){
+			console.log(result.sensor_details);
 			var options = {
-					host: result.sensor_details.hub_host,
-					port:  result.sensor_details.hub_port,
+					host: vSensor_host,
+					port:  vSensor_port,
 					path: '/suspend',
 					method: 'POST',
 					headers: {
@@ -315,6 +349,22 @@ exports.suspend_sensor= function(req, res){
 				});	
 				
 			});
+			
+			request.on('socket', function (socket) {
+			    socket.setTimeout(myTimeout);  
+			    socket.on('timeout', function() {
+			    	res.send({status : "failed"});
+			    	request.abort();
+			    });
+			});
+
+			request.on('error', function(err) {
+			    if (err.code === "ECONNRESET") {
+			        console.log("Timeout occurs");
+			        //specific error treatment
+			    }		    
+			});
+			
 			request.write(JSON.stringify(data));
 			request.end();	
 			
@@ -331,8 +381,8 @@ var vSensor_id = req.body.sensor_id;
 	virtualSensorDetails(vSensor_id, function(result){
 		if(result.status==="success"){
 			var options = {
-					host: result.sensor_details.hub_host,
-					port:  result.sensor_details.hub_port,
+					host: vSensor_host,
+					port:  vSensor_port,
 					path: '/terminate',
 					method: 'POST',
 					headers: {
@@ -366,6 +416,22 @@ var vSensor_id = req.body.sensor_id;
 				});	
 				
 			});
+			
+			request.on('socket', function (socket) {
+			    socket.setTimeout(myTimeout);  
+			    socket.on('timeout', function() {
+			    	res.send({status : "failed"});
+			    	request.abort();
+			    });
+			});
+
+			request.on('error', function(err) {
+			    if (err.code === "ECONNRESET") {
+			        console.log("Timeout occurs");
+			        //specific error treatment
+			    }		    
+			});
+			
 			request.write(JSON.stringify(data));
 			request.end();	
 			

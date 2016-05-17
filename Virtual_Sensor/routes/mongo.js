@@ -13,7 +13,7 @@ MongoClient.connect(url, function(err, database) {
 
 
 exports.save_sensor = function(sensor, callback){
-	db.collection('vSensors').insertOne({id : sensor.id, sensor : sensor}, function(err,r){
+	db.collection('vSensors').insertOne({id : parseInt(sensor.id), sensor : sensor}, function(err,r){
 		if(!err){
 			callback({status : "success"});
 		}else{
@@ -23,7 +23,7 @@ exports.save_sensor = function(sensor, callback){
 };
 
 exports.delete_sensor = function(sensor_id, callback){
-	db.collection('vSensors').deleteOne({id : sensor_id}, function(err,r){
+	db.collection('vSensors').deleteOne({id : parseInt(sensor_id)}, function(err,r){
 		if(!err){
 			callback({status : "success"});
 		}else{
@@ -33,8 +33,8 @@ exports.delete_sensor = function(sensor_id, callback){
 };
 
 exports.update_sensor = function(sensor, callback){
-	console.log(sensor);
-	db.collection('vSensors').updateOne({id : sensor.id}, {id : sensor.id, sensor : sensor}, function(err,r){
+	
+	db.collection('vSensors').updateOne({id : parseInt(sensor.id)}, {id : parseInt(sensor.id), sensor : sensor}, function(err,r){
 		if(!err){
 			callback({status : "success"});
 		}else{
@@ -44,7 +44,7 @@ exports.update_sensor = function(sensor, callback){
 };
 
 exports.read_sensor = function(sensor_id, callback){
-	db.collection('vSensors').findOne({id : sensor_id}, function(err,sensor){
+	db.collection('vSensors').findOne({id : parseInt(sensor_id)}, function(err,sensor){
 		if(!err){
 			callback({status : "success", sensor : sensor});
 		}else{
@@ -61,7 +61,7 @@ exports.read_all_sensors = function(callback){
 				data.push(docs[i].sensor);
 			}
 			if(data.length>0){
-				console.log(data);
+				
 				callback({status : "success", data : data});
 			}else{
 				callback({status : "no data"});

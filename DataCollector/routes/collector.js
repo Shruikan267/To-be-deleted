@@ -58,7 +58,7 @@ exports.collect_data = function(req, res){
 	request.on('socket', function (socket) {
 	    socket.setTimeout(myTimeout);  
 	    socket.on('timeout', function() {		    	
-	        req.abort();
+	    	request.abort();
 	        callback({status : "failed"});
 	    });
 	});

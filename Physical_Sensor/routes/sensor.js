@@ -4,11 +4,15 @@
 var mongo=require('./mongo');
 var sensor_list = [];
 
-mongo.read_sensors(function(result){
-	if(result.status==="success"){
-		sensor_list = result.data;
-	}
-});
+
+setTimeout(function(){
+	mongo.read_sensors(function(result){
+		if(result.status==="success"){
+			sensor_list = result.data;
+		}
+	});
+}, 2000);
+
 
 var counter=0;
 var sensor_data = require("./sensor_data");
@@ -16,8 +20,6 @@ var sensor_data = require("./sensor_data");
 var schedule = require('node-schedule');
 
 
-function destroy_sensor(sensor_id){
-}
 
 //var task = cron.schedule('* */15 * * * *', function() {
 //	for (var i=0, len = sensor_list.length; i<len; i++){
@@ -51,6 +53,7 @@ exports.create_api = function(req, res){
 
 exports.delete_api = function(req, res){	
 	var sensor_id = req.body.sensor_id;
+	console.log(sensor_id);
 	for (var i=0, len = sensor_list.length; i<len; i++){
 		if(sensor_list[i].id === sensor_id){
 			sensor_list.splice(i,1);
@@ -95,7 +98,7 @@ function addSensorToDb(sensor){
 }
 
 var rule = new schedule.RecurrenceRule();
-rule.minute = [10,20,30,40,50,59];
+rule.second = [10,20,30,40,50,59];
  
 var j = schedule.scheduleJob(rule, function(){
 	for (var i=0, len = sensor_list.length; i<len; i++){

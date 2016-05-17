@@ -8,11 +8,72 @@ var schedule = require('node-schedule');
 var myTimeout = 5000;
 var hub_list = [];
 
-mongo.read_hubs(function(result){
-	if(result.status==="success"){
-		hub_list = result.data;
-	}
-});
+
+setTimeout(function(){
+	mongo.read_hubs(function(result){
+		if(result.status==="success"){
+			hub_list = result.data;
+			
+			for(var i=0, len=hub_list.length;i <len; i++){
+				var hub = hub_list[i];
+				for(var j=0, len2=hub.sensors.length; j<len2; j++){
+					
+					var sensor = hub.sensors[j];
+					
+					sensor.delete_sensor = function(callback){
+						
+						var options = {
+								host: sensor.sensor_host,
+								port: sensor.sensor_port,
+								path: '/delete',
+								method: 'POST',
+								headers: {
+								      'Content-Type': 'application/json',
+							  }
+						};
+						var data = {};
+						data.sensor_id = sensor.id;
+						
+						var request = http.request(options, function(response){
+							
+							var str = '';
+							response.on('data', function (chunk) {
+							   str += chunk;
+							});				
+							
+							response.on('end', function() {
+								str = JSON.parse(str);
+							    if(str && str.status ==="success"){
+							    	
+									callback({status : "success"});
+								}
+							});	
+							
+						});
+						
+						request.on('socket', function (socket) {
+						    socket.setTimeout(myTimeout);  
+						    socket.on('timeout', function() {		    	
+						    	request.abort();
+						        callback({status : "failed"});
+						    });
+						});
+
+						request.on('error', function(err) {
+						    if (err.code === "ECONNRESET") {
+						        console.log("Timeout occurs");
+						        //specific error treatment
+						    }		    
+						});
+						
+						request.write(JSON.stringify(data));
+						request.end();
+					};
+				}
+			}
+		}
+	});	
+}, 2000);
 
 exports.create_hub = function(req, res){
 	
@@ -43,7 +104,7 @@ exports.add_sensor = function(req, res){
 	sensor.state = "Running";
 	
 	sensor.delete_sensor = function(callback){
-		console.log("inside delete function");
+	
 		var options = {
 				host: sensor.sensor_host,
 				port: sensor.sensor_port,
@@ -66,8 +127,8 @@ exports.add_sensor = function(req, res){
 			response.on('end', function() {
 				str = JSON.parse(str);
 			    if(str && str.status ==="success"){
-			    	console.log("Physical sensor deleted!");
-					callback();
+			    	
+					callback({status : "success"});
 				}
 			});	
 			
@@ -76,7 +137,7 @@ exports.add_sensor = function(req, res){
 		request.on('socket', function (socket) {
 		    socket.setTimeout(myTimeout);  
 		    socket.on('timeout', function() {		    	
-		        req.abort();
+		    	request.abort();
 		        callback({status : "failed"});
 		    });
 		});
@@ -93,7 +154,7 @@ exports.add_sensor = function(req, res){
 	};
 	
 	for(var i=0, len=hub_list.length; i<len; i++){
-		if(hub_list[i].id === hub_id){
+		if(parseInt(hub_list[i].id) === parseInt(hub_id)){
 			
 			var options = {
 					host: sensor.sensor_host,
@@ -153,9 +214,9 @@ exports.delete_sensor = function(req, res){
 	var sensor_id = req.body.sensor_id;
 	
 	for(var i=0, len=hub_list.length; i<len; i++){
-		if(hub_list[i].id === hub_id){
+		if(parseInt(hub_list[i].id) === parseInt(hub_id)){
 			for(var j=0, sensor_list_len=hub_list[i].sensors.length; j<sensor_list_len; j++){
-				if(hub_list[i].sensors[j].id === sensor_id){
+				if(parseInt(hub_list[i].sensors[j].id) === parseInt(sensor_id)){
 					
 					var callback = function(reslt){
 						if(reslt.status==="success"){
@@ -178,10 +239,11 @@ exports.delete_sensor = function(req, res){
 
 exports.delete_hub = function(req, res){
 	var hub_id = req.body.hub_id;
-	var deleted_count=0;
 	
+	var deleted_count=0;
 	for(var i=0, len=hub_list.length; i<len; i++){
-		if(hub_list[i].id === hub_id){
+		
+		if(parseInt(hub_list[i].id) === parseInt(hub_id)){
 			for(var j=0, sensor_list_len=hub_list[i].sensors.length; j<sensor_list_len; j++){
 				
 				var callback = function(reslt){
@@ -197,7 +259,6 @@ exports.delete_hub = function(req, res){
 						res.send({status : "failed"});
 					}
 				};
-				
 				hub_list[i].sensors[j].delete_sensor(callback);
 			}
 			break;
@@ -206,30 +267,13 @@ exports.delete_hub = function(req, res){
 };
 
 exports.view_hubs = function(req, res){
-//	for(var i=0, len=hub_list.length; i<len; i++){
-//		console.log('\n');
-//		console.log('Id: '+hub_list[i].id);
-//		console.log('Name: '+hub_list[i].name);
-//		console.log('Host: '+hub_list[i].host);
-//		console.log('Sensors: '+hub_list[i].sensors);
-//		console.log('\n');
-//	}
 	res.send( {hubs : hub_list});
 };
 
 exports.view_sensors = function(req, res){
 	var hub_id = req.body.hub_id;
 	for(var i=0, len=hub_list.length; i<len; i++){
-		if(hub_list[i].id === hub_id){
-//			for(var j=0, sensor_list_len=hub_list[i].sensors.length; j<sensor_list_len; j++){
-//				var sensor = hub_list[i].sensors[j];
-//				console.log('\n');
-//				console.log('Id: '+sensor.id);
-//				console.log('Name: '+sensor.name);
-//				console.log('Host: '+sensor.sensor_host);
-//				console.log('State: '+sensor.state);
-//				console.log('\n');
-//			}
+		if(parseInt(hub_list[i].id) === parseInt(hub_id)){
 			res.send( {sensors : hub_list[i].sensors});
 			break;			
 		}
@@ -239,14 +283,14 @@ exports.view_sensors = function(req, res){
 exports.get_data = function(req, res){
 	var sensor_id = req.body.sensor_id;
 	var hub_id = req.body.hub_id;
-	
 	for(var i=0, len=hub_list.length; i<len; i++){
 		var hub = hub_list[i];
-		if(hub.id === hub_id){
+		if(parseInt(hub.id) === parseInt(hub_id)){
+			
 			for(var j=0, sensor_list_len=hub.sensors.length; j<sensor_list_len; j++){
 				var sensor = hub.sensors[j];
-				if(sensor.id === sensor_id){
-					res.send({result:"success", data : sensor.data});
+				if(parseInt(sensor.id) === parseInt(sensor_id)){					
+					res.send({status:"success", data : sensor.data});
 					break;
 				}
 			}
@@ -257,7 +301,7 @@ exports.get_data = function(req, res){
 
 
 var rule = new schedule.RecurrenceRule();
-rule.minute = [9,19,29,39,49,59];
+rule.second = [10,20,30,40,50,59];
  
 var j = schedule.scheduleJob(rule, function(){
 	for(var i=0, len=hub_list.length; i<len; i++){
@@ -290,10 +334,21 @@ var j = schedule.scheduleJob(rule, function(){
 				  });				
 			});
 			
-
-			request.on('error', function(e) {
-				  console.log('problem with request: ' + e.message);
+			request.on('socket', function (socket) {
+			    socket.setTimeout(myTimeout);  
+			    socket.on('timeout', function() {		    	
+			    	request.abort();
+			        callback({status : "failed"});
+			    });
 			});
+
+			request.on('error', function(err) {
+			    if (err.code === "ECONNRESET") {
+			        console.log("Timeout occurs");
+			        //specific error treatment
+			    }		    
+			});
+
 			
 			var data = {};
 			data.sensor_id = sensor.id;

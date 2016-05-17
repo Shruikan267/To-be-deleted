@@ -6,6 +6,7 @@ var db;
 // Initialize connection once
 MongoClient.connect(url, function(err, database) {
   if(err){
+	  console.log(err);
 	  throw err;
   }
   db = database;
@@ -13,7 +14,7 @@ MongoClient.connect(url, function(err, database) {
 
 
 exports.save_sensor = function(sensor){
-	db.collection('pSensors').insertOne({id : sensor.id, sensor : sensor}, function(err,r){
+	db.collection('pSensors').insertOne({id : parseInt(sensor.id), sensor : sensor}, function(err,r){
 		if(!err){
 			//callback({status : "success"});
 		}else{
@@ -23,7 +24,7 @@ exports.save_sensor = function(sensor){
 };
 
 exports.delete_sensor = function(sensor_id){
-	db.collection('pSensors').deleteOne({id : sensor_id}, function(err,r){
+	db.collection('pSensors').deleteOne({id : parseInt(sensor_id)}, function(err,r){
 		if(!err){
 			//callback({status : "success"});
 		}else{
@@ -41,7 +42,6 @@ exports.read_sensors = function(callback){
 				data.push(docs[i].sensor);
 			}
 			if(data.length>0){
-				console.log(data);
 				callback({status : "success", data : data});
 			}else{
 				callback({status : "no data"});
