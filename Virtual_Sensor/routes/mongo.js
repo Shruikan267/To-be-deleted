@@ -1,5 +1,5 @@
 var MongoClient = require('mongodb').MongoClient;
-var url = 'mongodb://localhost:27017/sensorcloud';
+var url = 'mongodb://52.39.177.195:27017/sensorcloud';
 
 var db;
 

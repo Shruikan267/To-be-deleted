@@ -3,7 +3,7 @@
  */
 var http = require('http');
 var schedule = require('node-schedule');
-
+var myTimeout = 5000;
 var hub_list = [];
 
 exports.create_hub = function(req, res){
@@ -66,6 +66,24 @@ exports.add_sensor = function(req, res){
 			});	
 			
 		});
+		
+
+		
+		request.on('socket', function (socket) {
+		    socket.setTimeout(myTimeout);  
+		    socket.on('timeout', function() {		    	
+		        req.abort();
+		        callback({result : "failed"});
+		    });
+		});
+
+		request.on('error', function(err) {
+		    if (err.code === "ECONNRESET") {
+		        console.log("Timeout occurs");
+		        //specific error treatment
+		    }		    
+		});
+		
 		request.write(JSON.stringify(data));
 		request.end();
 	};
@@ -99,10 +117,26 @@ exports.add_sensor = function(req, res){
 					}
 				  });				
 			});
-			
+
+			request.on('socket', function (socket) {
+			    socket.setTimeout(myTimeout);  
+			    socket.on('timeout', function() {		    	
+			        req.abort();
+			        callback({result : "failed"});
+			    });
+			});
+
+			request.on('error', function(err) {
+			    if (err.code === "ECONNRESET") {
+			        console.log("Timeout occurs");			        
+			    }else{
+			    	 console.log('problem with request: ' + e.message);
+			    }
+			    res.send({result : "failed"});
+			});
 
 			request.on('error', function(e) {
-				  console.log('problem with request: ' + e.message);
+				 
 			});
 			
 			var data = {};
@@ -123,12 +157,15 @@ exports.delete_sensor = function(req, res){
 			for(var j=0, sensor_list_len=hub_list[i].sensors.length; j<sensor_list_len; j++){
 				if(hub_list[i].sensors[j].id === sensor_id){
 					
-					var callback = function(){
-						console.log("inside callback");
-						hub_list[i].sensors.splice(j,1);
-						res.send({result : "success"});		
-					};
-					
+					var callback = function(reslt){
+						if(reslt.result==="success"){
+							hub_list[i].sensors.splice(j,1);
+							res.send({result : "success"});	
+						}else{
+							res.send({result : "failed"});	
+						}
+							
+					};					
 					hub_list[i].sensors[j].delete_sensor(callback);
 					break;
 				}				
@@ -146,11 +183,16 @@ exports.delete_hub = function(req, res){
 		if(hub_list[i].id === hub_id){
 			for(var j=0, sensor_list_len=hub_list[i].sensors.length; j<sensor_list_len; j++){
 				
-				var callback = function(){
-					deleted_count++;
-					if(deleted_count===sensor_list_len){
-						hub_list.splice(i,1);
-						res.send({result : "success"});
+				var callback = function(reslt){
+					
+					if(reslt.result==="success"){
+						deleted_count++;
+						if(deleted_count===sensor_list_len){
+							hub_list.splice(i,1);
+							res.send({result : "success"});
+						}
+					}else{
+						res.send({result : "failed"});
 					}
 				};
 				
