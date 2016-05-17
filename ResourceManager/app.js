@@ -27,13 +27,18 @@ if ('development' == app.get('env')) {
   app.use(express.errorHandler());
 }
 
-
-
+/* This section contains APIs for providing details about resources owned by the user */
 app.post('/get-user-vSensors', userResoureMgr.get_vSensors);
+app.post('/get-user-pSensors', userResoureMgr.get_pSensors);
+app.post('/get-user-hubs', userResoureMgr.get_Hubs);
+
+/* This section contains APIs for creation and deletion of hubs and physical sensors */
 app.post('/create-hub', hubManager.createHub);
 app.post('/delete-hub', hubManager.deleteHub);
 app.post('/create-physical-sensor', hubManager.createSensor);
 app.post('/delete-physical-sensor', hubManager.deleteSensor);
+
+/* This section contains APIs for creating, suspending, resuming and terminating virtual sensors */
 
 http.createServer(app).listen(app.get('port'), function(){
   console.log('Express server listening on port ' + app.get('port'));

@@ -26,3 +26,33 @@ exports.get_vSensors = function(req, res){
 	});
 	
 };
+
+exports.get_pSensors = function(req, res){
+	
+	var sqlQuery = "select * from sensorcloud.physical_sensors where user_id = " + req.body.user_id;
+	
+	mysql.executeQuery(sqlQuery, function(err, rows){
+		if(!err){
+			res.send({status : "success", rows : rows});
+		}else{
+			console.log(err);
+			res.send({status : "failed"});
+		}
+	});
+	
+};
+
+exports.get_Hubs = function(req, res){
+	
+	var sqlQuery = "select * from sensorcloud.hubs where hub_user_id = " + req.body.user_id;
+	
+	mysql.executeQuery(sqlQuery, function(err, rows){
+		if(!err){
+			res.send({status : "success", rows : rows});
+		}else{
+			console.log(err);
+			res.send({status : "failed"});
+		}
+	});
+	
+};
