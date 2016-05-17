@@ -52,3 +52,24 @@ exports.read_sensor = function(sensor_id, callback){
 		}
 	});
 };
+
+exports.read_all_sensors = function(callback){
+	db.collection('vSensors').find({}).toArray(function(err, docs){
+		if(!err){
+			var data = [];
+			for(var i = 0, len = docs.length; i<len; i++){
+				data.push(docs[i].sensor);
+			}
+			if(data.length>0){
+				console.log(data);
+				callback({status : "success", data : data});
+			}else{
+				callback({status : "no data"});
+			}
+			
+		}else{
+			console.log(err);
+			callback({status : "failed"});
+		}
+	});
+};

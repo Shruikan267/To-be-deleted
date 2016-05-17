@@ -1,8 +1,15 @@
 /**
  * http://usejsdoc.org/
  */
-
+var mongo=require('./mongo');
 var sensor_list = [];
+
+mongo.read_sensors(function(result){
+	if(result.status==="success"){
+		sensor_list = result.data;
+	}
+});
+
 var counter=0;
 var sensor_data = require("./sensor_data");
 
@@ -10,12 +17,6 @@ var schedule = require('node-schedule');
 
 
 function destroy_sensor(sensor_id){
-	for (var i=0, len = sensor_list.length; i<len; i++){
-		if(sensor_list[i].id === sensor_id){
-			sensor_list.splice(i,1);
-			break;
-		}
-	}
 }
 
 //var task = cron.schedule('* */15 * * * *', function() {
@@ -43,18 +44,21 @@ exports.create_api = function(req, res){
 	
 	sensor_list.push(sensor);
 	
+	mongo.save_sensor(sensor);
 	
-	res.send({result : "success", data : sensor.data});
+	res.send({status : "success", data : sensor.data});
 };
 
-exports.delete_api = function(req, res){
-	
+exports.delete_api = function(req, res){	
 	var sensor_id = req.body.sensor_id;
-	console.log(sensor_id);
-	
-	destroy_sensor(sensor_id);
-	console.log("delete api called");
-	res.send({result : "success"});
+	for (var i=0, len = sensor_list.length; i<len; i++){
+		if(sensor_list[i].id === sensor_id){
+			sensor_list.splice(i,1);
+			mongo.delete_sensor(sensor_id);
+			res.send({status : "success"});
+			break;
+		}
+	}	
 };
 
 exports.get_data = function(req, res){
@@ -66,7 +70,7 @@ exports.get_data = function(req, res){
 			break;
 		}
 	}
-	res.send({result : "success", data : sensor_data});
+	res.send({status : "success", data : sensor_data});
 };
 
 
@@ -85,6 +89,10 @@ exports.view_sensors = function(req, res){
 	
 	res.send({sensors:sensor_list});
 };
+
+function addSensorToDb(sensor){
+	mongo.save_sensor(sensor);
+}
 
 var rule = new schedule.RecurrenceRule();
 rule.minute = [10,20,30,40,50,59];

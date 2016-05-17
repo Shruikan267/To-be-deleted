@@ -109,18 +109,18 @@ exports.createHub = function(req, res){
 				
 				response.on('end', function() {
 					str = JSON.parse(str);
-				    if(str && str.result ==="success"){
+				    if(str && str.status ==="success"){
 				    	var sqlQuery = 	createHubQueryBuilder(hub_id, hub_name, user_id, host, port);    	
 				    	
 				    	mysql.executeQuery(sqlQuery, function(err, rows){
 				    		if(!err){
-				    			res.send({result : "success"});
+				    			res.send({status : "success"});
 				    		}else{
-				    			res.send({result : "failed"});
+				    			res.send({status : "failed"});
 				    		}
 				    	});
 					}else{
-						res.send({result : "failed"});
+						res.send({status : "failed"});
 					}
 				});	
 				
@@ -194,17 +194,17 @@ exports.createSensor = function(req, res){
 				
 				response.on('end', function() {
 					str = JSON.parse(str);
-				    if(str && str.result ==="success"){
+				    if(str && str.status ==="success"){
 				    	var sqlQuery = 	createSensorQueryBuilder(sensor_id, sensor_name, hub_id, sensor_host, sensor_port, hub_host, hub_port);
 				    	mysql.executeQuery(sqlQuery, function(err, rows){
 				    		if(!err){
-				    			res.send({result : "success"});
+				    			res.send({status : "success"});
 				    		}else{
-				    			res.send({result : "failed"});
+				    			res.send({status : "failed"});
 				    		}
 				    	});
 					}else{
-						res.send({result : "failed"});
+						res.send({status : "failed"});
 					}
 				});	
 				
@@ -306,17 +306,17 @@ exports.deleteHub = function(req, res){
 				
 				response.on('end', function() {
 					str = JSON.parse(str);
-				    if(str && str.result ==="success"){
+				    if(str && str.status ==="success"){
 				    	deleteHubAndSensors(hub_id, function(result){
 				    		if(result.status==="success"){
-				    			res.send({result : "success"});
+				    			res.send({status : "success"});
 				    		}else{
-				    			res.send({result : "failed"});
+				    			res.send({status : "failed"});
 				    		}
 				    	});
 				    	
 					}else{
-						res.send({result : "failed"});
+						res.send({status : "failed"});
 					}
 				});	
 				
@@ -402,17 +402,17 @@ exports.deleteSensor = function(req, res){
 				
 				response.on('end', function() {
 					str = JSON.parse(str);
-				    if(str && str.result ==="success"){
+				    if(str && str.status ==="success"){
 				    	deleteSensorsFromDb(sensor_id, function(result){
 				    		if(result.status==="success"){
-				    			res.send({result : "success"});
+				    			res.send({status : "success"});
 				    		}else{
-				    			res.send({result : "failed"});
+				    			res.send({status : "failed"});
 				    		}
 				    	});
 				    	
 					}else{
-						res.send({result : "failed"});
+						res.send({status : "failed"});
 					}
 				});	
 				

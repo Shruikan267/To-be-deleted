@@ -16,21 +16,21 @@ exports.collect_data = function(req, res){
 	};
 	
 	var callback = function(response_data){
-		if(response_data.result==="success"){
+		if(response_data.status==="success"){
 			var sensor_data = {};
 			sensor_data.data = response_data.data;
 			sensor_data.id = vSensor_details.id;
 			sensor_data.user_id = vSensor_details.user_id;
 			mongo.save_data(sensor_data, function(result){
 				if(result.status === "success"){
-					res.send({result : "success"});
+					res.send({status : "success"});
 				}else{
-					res.send({result : "failed"});
+					res.send({status : "failed"});
 				}
 			});
 			
 		}else{
-			res.send({result : "failed"});
+			res.send({status : "failed"});
 		}
 	};
 	
@@ -59,7 +59,7 @@ exports.collect_data = function(req, res){
 	    socket.setTimeout(myTimeout);  
 	    socket.on('timeout', function() {		    	
 	        req.abort();
-	        callback({result : "failed"});
+	        callback({status : "failed"});
 	    });
 	});
 

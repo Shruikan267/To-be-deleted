@@ -5,6 +5,12 @@ var schedule = require('node-schedule');
 var vSensor_list = [];
 var counter = 0;
 
+mongo.read_all_sensors(function(result){
+	if(result.status==="success"){
+		vSensor_list = result.data;
+	}
+});
+
 exports.create_sensor = function(req, res){
 	var vSensor_params = req.body.vSensor_params;
 	var vSensor_details = vSensor_params.vSensor_details;
@@ -45,7 +51,7 @@ exports.create_sensor = function(req, res){
 		
 		response.on('end', function() {
 			str = JSON.parse(str);
-		    if(str && str.result ==="success"){
+		    if(str && str.status ==="success"){
 		    	var sensor_data = {};
 		    	if(vSensor.pollutants.ozone){
 		    		sensor_data.ozone = str.data.ozone;
@@ -67,9 +73,9 @@ exports.create_sensor = function(req, res){
 		    	mongo.save_sensor(vSensor, function(result){
 		    		if(result.status==="success"){
 		    			vSensor_list.push(vSensor);
-		    			res.send({result : "success"});
+		    			res.send({status : "success"});
 		    		}else{
-		    			res.send({result : "failed"});
+		    			res.send({status : "failed"});
 		    			console.log(result.error);
 		    		}
 		    	});
@@ -81,8 +87,6 @@ exports.create_sensor = function(req, res){
 	});
 	request.write(JSON.stringify(data));
 	request.end();	
-	res.send({result:"success"});
-	
 };
 
 exports.suspend_sensor = function(req, res){
@@ -95,9 +99,9 @@ exports.suspend_sensor = function(req, res){
 			mongo.update_sensor(sensor, function(update_result){
 				if(update_result.status==="success"){
 					vSensor_list.splice(i,1);
-					res.send({result : "success"});
+					res.send({status : "success"});
 				}else{
-					res.send({result : "failed"});
+					res.send({status : "failed"});
 					console.log(update_result.error);
 				}
 			});			
@@ -115,9 +119,9 @@ exports.terminate_sensor = function(req, res){
 			mongo.delete_sensor(vSensor_list[i].id, function(result){
 				if(result.status==="success"){
 					vSensor_list.splice(i,1);
-	    			res.send({result : "success"});
+	    			res.send({status : "success"});
 	    		}else{
-	    			res.send({result : "failed"});
+	    			res.send({status : "failed"});
 	    			console.log(result.error);
 	    		}
 			});
@@ -137,14 +141,14 @@ exports.start_sensor = function(req, res){
 			mongo.update_sensor(sensor, function(update_result){
 				if(update_result.status==="success"){
 					vSensor_list.push(sensor);
-					res.send({result : "success"});
+					res.send({status : "success"});
 				}else{
-					res.send({result : "failed"});
+					res.send({status : "failed"});
 					console.log(update_result.error);
 				}
 			});
 		}else{
-			res.send({result : "failed"});
+			res.send({status : "failed"});
 			console.log(result.error);
 		}
 	});
@@ -155,7 +159,7 @@ exports.get_data = function(req,res){
 	var vSensor_id = req.body.sensor_id;
 	for(var i=0, len=vSensor_list.length; i<len; i++){
 		if(vSensor_list[i].id === vSensor_id){
-			res.send({result : "success", data : vSensor_list[i].data});
+			res.send({status : "success", data : vSensor_list[i].data});
 			break;
 		}
 	}

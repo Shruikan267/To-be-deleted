@@ -1,10 +1,18 @@
 /**
  * http://usejsdoc.org/
  */
+
+var mongo=require('./mongo');
 var http = require('http');
 var schedule = require('node-schedule');
 var myTimeout = 5000;
 var hub_list = [];
+
+mongo.read_hubs(function(result){
+	if(result.status==="success"){
+		hub_list = result.data;
+	}
+});
 
 exports.create_hub = function(req, res){
 	
@@ -16,8 +24,8 @@ exports.create_hub = function(req, res){
 	hub.port = hub_params.port;
 	hub.sensors = [];
 	hub_list.push(hub);
-	
-	res.send({result : "success"});
+	mongo.save_hub(hub);
+	res.send({status : "success"});
 };
 
 /* function creates a sensor and adds to the hub*/
@@ -46,8 +54,6 @@ exports.add_sensor = function(req, res){
 			  }
 		};
 		var data = {};
-		console.log(sensor.id);
-		console.log(this);
 		data.sensor_id = sensor.id;
 		
 		var request = http.request(options, function(response){
@@ -59,7 +65,7 @@ exports.add_sensor = function(req, res){
 			
 			response.on('end', function() {
 				str = JSON.parse(str);
-			    if(str && str.result ==="success"){
+			    if(str && str.status ==="success"){
 			    	console.log("Physical sensor deleted!");
 					callback();
 				}
@@ -67,13 +73,11 @@ exports.add_sensor = function(req, res){
 			
 		});
 		
-
-		
 		request.on('socket', function (socket) {
 		    socket.setTimeout(myTimeout);  
 		    socket.on('timeout', function() {		    	
 		        req.abort();
-		        callback({result : "failed"});
+		        callback({status : "failed"});
 		    });
 		});
 
@@ -110,10 +114,11 @@ exports.add_sensor = function(req, res){
 				
 				response.on('end', function() {
 					str = JSON.parse(str);
-				    if(str && str.result ==="success"){
+				    if(str && str.status ==="success"){
 				    	sensor.data = str.data;
 						hub_list[i].sensors.push(sensor);
-						res.send({result : "success"});
+						mongo.update_hub(hub_list[i]);
+						res.send({status : "success"});
 					}
 				  });				
 			});
@@ -131,7 +136,7 @@ exports.add_sensor = function(req, res){
 			    }else{
 			    	 console.log('problem with request: ' + err.message);
 			    }
-			    res.send({result : "failed"});
+			    res.send({status : "failed"});
 			});
 			
 			var data = {};
@@ -153,11 +158,12 @@ exports.delete_sensor = function(req, res){
 				if(hub_list[i].sensors[j].id === sensor_id){
 					
 					var callback = function(reslt){
-						if(reslt.result==="success"){
+						if(reslt.status==="success"){
 							hub_list[i].sensors.splice(j,1);
-							res.send({result : "success"});	
+							mongo.update_hub(hub_list[i]);
+							res.send({status : "success"});	
 						}else{
-							res.send({result : "failed"});	
+							res.send({status : "failed"});	
 						}
 							
 					};					
@@ -180,14 +186,15 @@ exports.delete_hub = function(req, res){
 				
 				var callback = function(reslt){
 					
-					if(reslt.result==="success"){
+					if(reslt.status==="success"){
 						deleted_count++;
 						if(deleted_count===sensor_list_len){
 							hub_list.splice(i,1);
-							res.send({result : "success"});
+							mongo.delete_hub(hub_id);
+							res.send({status : "success"});
 						}
 					}else{
-						res.send({result : "failed"});
+						res.send({status : "failed"});
 					}
 				};
 				
@@ -277,7 +284,7 @@ var j = schedule.scheduleJob(rule, function(){
 				
 				response.on('end', function() {
 					str = JSON.parse(str);
-				    if(str && str.result ==="success"){
+				    if(str && str.status ==="success"){
 				    	sensor.data = str.data;						
 					}
 				  });				

@@ -19,9 +19,9 @@ function get_user_vSensors(user_id, callback){
 exports.get_vSensors = function(req, res){
 	get_user_vSensors(req.body.user_id, function(result){
 		if(result.status === "success"){
-			res.send({result : "success", rows : result.rows});			
+			res.send({status : "success", rows : result.rows});			
 		}else{
-			res.send({result : "failed"});
+			res.send({status : "failed"});
 		}
 	});
 	

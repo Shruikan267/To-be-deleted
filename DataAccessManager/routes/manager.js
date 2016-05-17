@@ -42,14 +42,14 @@ exports.get_data = function(req, res){
 				data.push(tempObj);
 			}
 			if(data.length>0){
-				res.send({result : "success", data : data});
+				res.send({status : "success", data : data});
 			}else{
-				res.send({result : "no data"});
+				res.send({status : "no data"});
 			}
 			
 		}else{
 			console.log(err);
-			res.send({result : "failed"});
+			res.send({status : "failed"});
 		}
 	});
 	
