@@ -121,8 +121,7 @@ exports.add_sensor = function(req, res){
 			request.on('socket', function (socket) {
 			    socket.setTimeout(myTimeout);  
 			    socket.on('timeout', function() {		    	
-			        req.abort();
-			        callback({result : "failed"});
+			        req.abort();			        
 			    });
 			});
 
@@ -130,13 +129,9 @@ exports.add_sensor = function(req, res){
 			    if (err.code === "ECONNRESET") {
 			        console.log("Timeout occurs");			        
 			    }else{
-			    	 console.log('problem with request: ' + e.message);
+			    	 console.log('problem with request: ' + err.message);
 			    }
 			    res.send({result : "failed"});
-			});
-
-			request.on('error', function(e) {
-				 
 			});
 			
 			var data = {};

@@ -5,6 +5,7 @@
 
 var express = require('express')
   , userResoureMgr = require('./routes/userResourceManager')
+  , hubManager = require('./routes/hubManager')
   , http = require('http')
   , path = require('path');
 
@@ -25,7 +26,14 @@ app.use(express.static(path.join(__dirname, 'public')));
 if ('development' == app.get('env')) {
   app.use(express.errorHandler());
 }
-app.post('/get-user-vSensors', userResoureMgr.get_vSensors)
+
+
+
+app.post('/get-user-vSensors', userResoureMgr.get_vSensors);
+app.post('/create-hub', hubManager.createHub);
+app.post('/delete-hub', hubManager.deleteHub);
+app.post('/create-physical-sensor', hubManager.createSensor);
+app.post('/delete-physical-sensor', hubManager.deleteSensor);
 
 http.createServer(app).listen(app.get('port'), function(){
   console.log('Express server listening on port ' + app.get('port'));
