@@ -1,0 +1,14 @@
+{
+  "name": "ResourceManager",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "start": "node app.js"
+  },
+  "dependencies": {
+    "ejs": "*",
+    "express": "3.2.6",
+    "mysql": "^2.10.2",
+    "node-schedule": "^1.1.0"
+  }
+}
