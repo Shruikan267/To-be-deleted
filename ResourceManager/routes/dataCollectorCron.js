@@ -6,6 +6,8 @@ var schedule = require('node-schedule');
 var collector_host = "localhost";
 var collector_port = 3003;
  
+var pSensor_host = "localhost";
+var pSensor_port = 3000;
 
 function getActiveSensors(callback){
 	var sqlQuery = "SELECT * FROM sensorcloud.virtual_sensors where state = 'Running'";
@@ -56,7 +58,7 @@ function collect_data(options, data){
 
 exports.runCron = function(){
 	var rule = new schedule.RecurrenceRule();
-	rule.second = [12,24,36,48,59];
+	rule.second = [30,59];
 	
 	var j = schedule.scheduleJob(rule, function(){
 		getActiveSensors(function(sensor_list){

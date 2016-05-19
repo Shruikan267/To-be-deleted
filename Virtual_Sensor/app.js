@@ -33,6 +33,10 @@ app.post('/terminate',virtual_sensor.terminate_sensor);
 app.post('/get-data',virtual_sensor.get_data);
 app.post('/get-sensors',virtual_sensor.get_sensors);
 
+app.post('/ping', function(req, res){
+	res.send();
+});
+
 http.createServer(app).listen(app.get('port'), function(){
   console.log('Express server listening on port ' + app.get('port'));
 });

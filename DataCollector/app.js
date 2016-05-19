@@ -28,6 +28,10 @@ if ('development' == app.get('env')) {
 
 app.post('/collect-data', collector.collect_data);
 
+app.post('/ping', function(req, res){
+	res.send();
+});
+
 http.createServer(app).listen(app.get('port'), function(){
   console.log('Express server listening on port ' + app.get('port'));
 });

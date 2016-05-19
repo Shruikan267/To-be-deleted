@@ -5,13 +5,13 @@ var myTimeout = 5000;
 
 exports.create_sensor = function(req, res){
 	
-	var user_id = req.body.user_id;
+	
 	var pSensor_id = req.body.pSensor_id;
 	var sensor_name = req.body.sensor_name;
 	var pollutants = req.body.pollutants;
 	
 	var data = {
-		user_id : user_id,
+		user_id : req.sensorcloud.user_id,
 		pSensor_id : pSensor_id,
 		sensor_name : sensor_name,
 		pollutants : pollutants
