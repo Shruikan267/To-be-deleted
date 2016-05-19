@@ -9,12 +9,14 @@
 <link href="css/datepicker3.css" rel="stylesheet">
 <link href="css/styles.css" rel="stylesheet">
 
-<script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/angularjs/1.0.7/angular.min.js"></script>
+<script type="text/javascript"
+	src="//ajax.googleapis.com/ajax/libs/angularjs/1.0.7/angular.min.js"></script>
 
 <script src="controllers/vSensorController.js"></script>
 <!--Icons-->
 <script src="js/lumino.glyphs.js"></script>
-
+<script
+	src="https://raw.githubusercontent.com/michaelbromley/angularUtils/master/src/directives/pagination/dirPagination.js"></script>
 <!--[if lt IE 9]>
 <script src="js/html5shiv.js"></script>
 <script src="js/respond.min.js"></script>
@@ -26,28 +28,34 @@
 	<nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
 		<div class="container-fluid">
 			<div class="navbar-header">
-				<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#sidebar-collapse">
-					<span class="sr-only">Toggle navigation</span>
-					<span class="icon-bar"></span>
-					<span class="icon-bar"></span>
-					<span class="icon-bar"></span>
+				<button type="button" class="navbar-toggle collapsed"
+					data-toggle="collapse" data-target="#sidebar-collapse">
+					<span class="sr-only">Toggle navigation</span> <span
+						class="icon-bar"></span> <span class="icon-bar"></span> <span
+						class="icon-bar"></span>
 				</button>
 				<a class="navbar-brand" href="#"><span>Sensor</span>Cloud</a>
 				<ul class="user-menu">
-					<li class="dropdown pull-right">
-						<a href="#" class="dropdown-toggle" data-toggle="dropdown"><svg class="glyph stroked male-user"><use xlink:href="#stroked-male-user"></use></svg> User <span class="caret"></span></a>
+					<li class="dropdown pull-right"><a href="#"
+						class="dropdown-toggle" data-toggle="dropdown"><svg
+								class="glyph stroked male-user">
+								<use xlink:href="#stroked-male-user"></use></svg> User <span
+							class="caret"></span></a>
 						<ul class="dropdown-menu" role="menu">
-							<li><a href="#"><svg class="glyph stroked male-user"><use xlink:href="#stroked-male-user"></use></svg> Profile</a></li>
-							<li><a href="#"><svg class="glyph stroked gear"><use xlink:href="#stroked-gear"></use></svg> Settings</a></li>
-							<li><a href="/logout"><svg class="glyph stroked cancel"><use xlink:href="#stroked-cancel"></use></svg> Logout</a></li>
-						</ul>
-					</li>
+							<li><a href="#"><svg class="glyph stroked male-user">
+										<use xlink:href="#stroked-male-user"></use></svg> Profile</a></li>
+							<li><a href="#"><svg class="glyph stroked gear">
+										<use xlink:href="#stroked-gear"></use></svg> Settings</a></li>
+							<li><a href="/logout"><svg class="glyph stroked cancel">
+										<use xlink:href="#stroked-cancel"></use></svg> Logout</a></li>
+						</ul></li>
 				</ul>
 			</div>
-							
-		</div><!-- /.container-fluid -->
+
+		</div>
+		<!-- /.container-fluid -->
 	</nav>
-		
+
 	<div id="sidebar-collapse" class="col-sm-3 col-lg-2 sidebar">
 		<form role="search">
 			<div class="form-group">
@@ -55,38 +63,50 @@
 			</div>
 		</form>
 		<ul class="nav menu">
-			<li><a href="/index"><svg class="glyph stroked dashboard-dial"><use xlink:href="#stroked-dashboard-dial"></use></svg> Dashboard</a></li>
-			<li class="active"><a href="/sensors"><svg class="glyph stroked calendar"><use xlink:href="#stroked-calendar"></use></svg> Sensors</a></li>
-			<li><a href="/devices"><svg class="glyph stroked star"><use xlink:href="#stroked-star"></use></svg> Physical Devices</a></li>
-			
+			<li><a href="/index"><svg
+						class="glyph stroked dashboard-dial">
+						<use xlink:href="#stroked-dashboard-dial"></use></svg> Dashboard</a></li>
+			<li class="active"><a href="/sensors"><svg
+						class="glyph stroked calendar">
+						<use xlink:href="#stroked-calendar"></use></svg> Sensors</a></li>
+			<li><a href="/devices"><svg class="glyph stroked star">
+						<use xlink:href="#stroked-star"></use></svg> Physical Devices</a></li>
+
 			<li role="presentation" class="divider"></li>
-			<li><a href="/logout"><svg class="glyph stroked male-user"><use xlink:href="#stroked-male-user"></use></svg> Logout</a></li>
+			<li><a href="/logout"><svg class="glyph stroked male-user">
+						<use xlink:href="#stroked-male-user"></use></svg> Logout</a></li>
 		</ul>
 
-	</div><!--/.sidebar-->
-		
-	<div class="col-sm-9 col-sm-offset-3 col-lg-10 col-lg-offset-2 main">			
+	</div>
+	<!--/.sidebar-->
+
+	<div class="col-sm-9 col-sm-offset-3 col-lg-10 col-lg-offset-2 main">
 		<div class="row">
 			<ol class="breadcrumb">
-				<li><a href="/index"><svg class="glyph stroked home"><use xlink:href="#stroked-home"></use></svg></a></li>
+				<li><a href="/index"><svg class="glyph stroked home">
+							<use xlink:href="#stroked-home"></use></svg></a></li>
 				<li class="active">Sensors</li>
 			</ol>
-		</div><!--/.row-->
-		
+		</div>
+		<!--/.row-->
+
 		<div class="row">
 			<div class="col-lg-12">
 				<h1 class="page-header">Sensors</h1>
 			</div>
-		</div><!--/.row-->	
-		
+		</div>
+		<!--/.row-->
+
 		<div class="row">
 			<div class="col-lg-12">
-				<div class="panel panel-default" style="min-height:600px;">
+				<div class="panel panel-default" style="min-height: 600px;">
 					<div class="panel-heading">Sensors Overview</div>
 					<div class="panel-body">
 						<div class="row">
 							<div class="col-md-4">
-								<button class="btn btn-primary" style="margin-bottom:10px;" data-toggle="modal" data-target="#myModal">Add Sensor</button>
+								<button class="btn btn-primary"
+									ng-click="getPhysicalSensorList()" style="margin-bottom: 10px;"
+									data-toggle="modal" data-target="#myModal">Add Sensor</button>
 							</div>
 						</div>
 						<div class="row">
@@ -102,9 +122,13 @@
 										<td style="text-align: center">{{sensor.sensor_id}}</td>
 										<td style="text-align: center">{{sensor.state}}</td>
 										<td style="text-align: center">
-											<button class="btn btn-primary" style="margin:5px;">View</button>
-											<button class="btn btn-primary {{sensor.color_class}}" ng-click="resume_suspend($index)">{{sensor.actn}}</button>
-											<button class="btn btn-primary btn-danger" ng-click="terminate($index)">Terminate</button>
+											<button class="btn btn-primary" style="margin: 5px;"
+												ng-click="showSensorData($index)" data-toggle="modal"
+												data-target="#myModal2">View</button>
+											<button class="btn btn-primary btn-warning"
+												ng-click="resume_suspend($index)">{{sensor.actn}}</button>
+											<button class="btn btn-primary btn-danger"
+												ng-click="terminate($index)">Terminate</button>
 										</td>
 									</tr>
 								</table>
@@ -119,31 +143,192 @@
 					</div>
 				</div>
 			</div>
-		</div><!--/.row-->
-		
-		
-							
-	</div>	<!--/.main-->
+		</div>
+		<!--/.row-->
+
+
+
+	</div>
+	<!--/.main-->
 
 	<script src="js/jquery-1.11.1.min.js"></script>
 	<script src="js/bootstrap.min.js"></script>
 	<script>
-
-
-		!function ($) {
-		    $(document).on("click","ul.nav li.parent > a > span.icon", function(){          
-		        $(this).find('em:first').toggleClass("glyphicon-minus");      
-		    }); 
-		    $(".sidebar span.icon").find('em:first').addClass("glyphicon-plus");
+		!function($) {
+			$(document)
+					.on(
+							"click",
+							"ul.nav li.parent > a > span.icon",
+							function() {
+								$(this).find('em:first').toggleClass(
+										"glyphicon-minus");
+							});
+			$(".sidebar span.icon").find('em:first').addClass("glyphicon-plus");
 		}(window.jQuery);
 
-		$(window).on('resize', function () {
-		  if ($(window).width() > 768) $('#sidebar-collapse').collapse('show')
+		$(window).on('resize', function() {
+			if ($(window).width() > 768)
+				$('#sidebar-collapse').collapse('show')
 		})
-		$(window).on('resize', function () {
-		  if ($(window).width() <= 767) $('#sidebar-collapse').collapse('hide')
+		$(window).on('resize', function() {
+			if ($(window).width() <= 767)
+				$('#sidebar-collapse').collapse('hide')
 		})
-	</script>	
+	</script>
+
+	<script>
+		function create_sensor() {
+			var e = document.getElementById("sel1");
+			var selected_id = e.options[e.selectedIndex].value;
+			console.log(selected_id);
+
+			var checkboxes = document.getElementsByName("pollutant");
+			var checkboxesCheckedCount = 0;
+
+			var dataPollutant = {};
+			dataPollutant.ppm = false;
+			dataPollutant.ozone = false;
+			dataPollutant.so2 = false;
+			dataPollutant.n2o = false;
+			dataPollutant.co = false;
+			// loop over them all
+			for (var i = 0; i < checkboxes.length; i++) {
+				// And stick the checked ones onto an array...
+				if (checkboxes[i].checked && checkboxes[i].value === "ozone") {
+					dataPollutant.ozone = true;
+					checkboxesCheckedCount++;
+				} else if (checkboxes[i].checked
+						&& checkboxes[i].value === "ppm") {
+					dataPollutant.ppm = true;
+					checkboxesCheckedCount++;
+				} else if (checkboxes[i].checked
+						&& checkboxes[i].value === "so2") {
+					dataPollutant.so2 = true;
+					checkboxesCheckedCount++;
+				} else if (checkboxes[i].checked
+						&& checkboxes[i].value === "n2o") {
+					dataPollutant.n2o = true;
+					checkboxesCheckedCount++;
+				} else if (checkboxes[i].checked
+						&& checkboxes[i].value === "co") {
+					dataPollutant.co = true;
+					checkboxesCheckedCount++;
+				}
+			}
+
+			if (checkboxesCheckedCount == 0) {
+				$("#errMsg").removeClass("hidden").addClass("visible");
+			} else {
+				$("#dismiss_popup").click();
+				$("#errMsg").removeClass("visible").addClass("hidden");
+				for (var i = 0; i < checkboxes.length; i++) {
+					checkboxes[i].checked = false;
+				}
+				console.log(dataPollutant);
+
+				$.post("/create-virtual-sensor", {
+					pSensor_id : selected_id,
+					pollutants : dataPollutant,
+					sensor_name : "Test"
+				}, function(data, status) {
+					console.log("Data: " + data + "\nStatus: " + status);
+					window.location.href = '/sensors';
+				});
+			}
+
+			for (var i = 0; i < checkboxes.length; i++) {
+				checkboxes[i].checked = false;
+			}
+		}
+	</script>
+
+	<div id="myModal" class="modal fade" tabindex="-1" role="dialog">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal"
+						aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					</button>
+					<h4 class="modal-title">Select Sensor Location</h4>
+				</div>
+				<div class="modal-body">
+					<select class="form-control" id="sel1">
+						<option value="{{pSensor.sensor_id}}"
+							ng-repeat="pSensor in physical_sensors">{{pSensor.sensor_name}}</option>
+					</select>
+					<hr />
+					Track the below parameters
+					<hr />
+					<input type="checkbox" name="pollutant" value="ozone">
+					Ozone<br> <input type="checkbox" name="pollutant" value="co">
+					CO<br> <input type="checkbox" name="pollutant" value="ppm">
+					PPM<br> <input type="checkbox" name="pollutant" value="n2o">
+					N2O<br> <input type="checkbox" name="pollutant" value="so2">
+					SO2<br>
+					<div id="errMsg" class="hidden" style="color: red">Please
+						select atleast one pollutant!</div>
+				</div>
+				<div class="modal-footer">
+					<button type="button" id="dismiss_popup" class="btn btn-default"
+						data-dismiss="modal">Close</button>
+					<button type="button" class="btn btn-primary"
+						onclick="create_sensor()">Add Sensor</button>
+				</div>
+			</div>
+			<!-- /.modal-content -->
+		</div>
+		<!-- /.modal-dialog -->
+	</div>
+	<!-- /.modal -->
+
+
+	<div id="myModal2" class="modal fade" tabindex="-1" role="dialog">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal"
+						aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					</button>
+					<h4 class="modal-title">Sensor Data</h4>
+				</div>
+				<div class="modal-body">
+					<table width="600px">
+						<tr>
+							<th>Ozone</th>
+							<th>PPM</th>
+							<th>CO</th>
+							<th>SO2</th>
+							<th>N2O</th>
+							<th>Data Collection Time</th>
+						</tr>
+						<tr dir-paginate="dispData in display_data|itemsPerPage:10">
+
+							<td>{{dispData.data.ozone}}</td>
+							<td>{{dispData.data.ppm}}</td>
+							<td>{{dispData.data.co}}</td>
+							<td>{{dispData.data.so2}}</td>
+							<td>{{dispData.data.n2o}}</td>
+							<td>{{dispData.time|date:'MM/dd/yyyy @ h:mma'}}</td>
+
+						</tr>
+					</table>
+					<dir-pagination-controls max-size="5" direction-links="true"
+						boundary-links="true"> </dir-pagination-controls>
+				</div>
+				<div class="modal-footer">
+					<button type="button" id="dismiss_popup" class="btn btn-default"
+						data-dismiss="modal">Close</button>
+				</div>
+			</div>
+			<!-- /.modal-content -->
+		</div>
+		<!-- /.modal-dialog -->
+	</div>
+	<!-- /.modal -->
+
+
 </body>
 
 </html>

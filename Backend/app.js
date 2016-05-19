@@ -9,6 +9,7 @@ var express = require('express')
   , adminManager = require('./routes/adminManager')
   , hubManager = require('./routes/hubs')
   , vSensorManager = require('./routes/vSensors')
+  , data_access = require('./routes/dataAccess')  
   , userResoureMgr = require('./routes/userResources')
   , http = require('http')
   , path = require('path');
@@ -77,6 +78,8 @@ app.get('/devices', function(req, res){
 
 app.get('/', routes.index);
 app.get('/users', user.list);
+
+app.post('/get-all-sensor-data', data_access.get_data);
 
 app.post('/sign-in', user.sign_in);
 app.post('/sign-up', user.sign_up);

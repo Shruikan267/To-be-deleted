@@ -5,15 +5,13 @@ var myTimeout = 5000;
 var options = {		
 	host: host,
 	port: port,
-	method: 'POST',
-	headers: {
-	      'Content-Type': 'application/json',
-	}
+	method: 'GET'
 };
 
 exports.get_all_vSensors = function(req, res){
 	options.path = '/get-all-vSensors';
 	var data = {
+			id:1
 	};
 	
 var request = http.request(options, function(response){
@@ -48,17 +46,12 @@ var request = http.request(options, function(response){
 	        //specific error treatment
 	    }		    
 	});
-	
-	request.write(JSON.stringify(data));
 	request.end();
 	
 };
 
 exports.get_all_pSensors = function(req, res){
 	options.path = '/get-all-pSensors';
-	var data = {
-	};
-	
 	
 	
 	var request = http.request(options, function(response){
@@ -69,6 +62,7 @@ exports.get_all_pSensors = function(req, res){
 		});				
 		
 		response.on('end', function() {
+			console.log(str);
 			str = JSON.parse(str);
 		    if(str && str.status ==="success"){		    	
 		    	res.send({status : "success", data : str.rows});
@@ -93,16 +87,11 @@ exports.get_all_pSensors = function(req, res){
 	        //specific error treatment
 	    }		    
 	});
-	
-	request.write(JSON.stringify(data));
 	request.end();
 };
 
 exports.get_all_hubs = function(req, res){
 	options.path = '/get-all-hubs';
-	var data = {
-	};
-	
 	
 var request = http.request(options, function(response){
 		
@@ -137,7 +126,5 @@ var request = http.request(options, function(response){
 	        //specific error treatment
 	    }		    
 	});
-	
-	request.write(JSON.stringify(data));
 	request.end();
 };

@@ -12,6 +12,7 @@ MongoClient.connect(url, function(err, database) {
 
 exports.get_data = function(req, res){
 	var user_id = req.body.user_id;
+	console.log(user_id);
 	var data = [];
 //	db.collection('sensor_data').find({}).sort({time : -1}).each(function(err, dt){
 //		if(!err){
@@ -42,6 +43,7 @@ exports.get_data = function(req, res){
 				data.push(tempObj);
 			}
 			if(data.length>0){
+				console.log(data);
 				res.send({status : "success", data : data});
 			}else{
 				res.send({status : "no data"});

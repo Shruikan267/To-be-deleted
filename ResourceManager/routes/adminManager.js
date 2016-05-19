@@ -16,7 +16,7 @@ exports.get_all_vSensors = function(req, res){
 };
 
 exports.get_all_pSensors = function(req, res){
-	
+	console.log("inside get all psensors");
 	var sqlQuery = "select * from sensorcloud.physical_sensors;";
 	
 	mysql.executeQuery(sqlQuery, function(err, rows){
