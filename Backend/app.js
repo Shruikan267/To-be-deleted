@@ -6,6 +6,7 @@
 var express = require('express')
   , routes = require('./routes')
   , user = require('./routes/user')
+  , adminManager = require('./routes/adminManager')
   , hubManager = require('./routes/hubs')
   , vSensorManager = require('./routes/vSensors')
   , userResoureMgr = require('./routes/userResources')
@@ -79,6 +80,11 @@ app.get('/users', user.list);
 
 app.post('/sign-in', user.sign_in);
 app.post('/sign-up', user.sign_up);
+
+/* This section contains APIs for providing details about resources owned by all users to the admin */
+app.get('/get-all-vSensors', adminManager.get_all_vSensors);
+app.get('/get-all-pSensors', adminManager.get_all_pSensors);
+app.get('/get-all-hubs', adminManager.get_all_hubs);
 
 /* This section contains APIs for providing details about resources owned by the user */
 app.get('/get-user-vSensors', userResoureMgr.get_vSensors);

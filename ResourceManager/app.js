@@ -5,6 +5,7 @@
 
 var express = require('express')
   , userResoureMgr = require('./routes/userResourceManager')
+  , adminManager = require('./routes/adminManager')
   , hubManager = require('./routes/hubManager')
   , vSensorManager = require('./routes/vSensorManager')
   , dataCollector = require('./routes/dataCollectorCron')
@@ -28,6 +29,11 @@ app.use(express.static(path.join(__dirname, 'public')));
 if ('development' == app.get('env')) {
   app.use(express.errorHandler());
 }
+
+/* This section contains APIs for providing details about resources owned by all users to the admin */
+app.get('/get-all-vSensors', adminManager.get_all_vSensors);
+app.get('/get-all-pSensors', adminManager.get_all_pSensors);
+app.get('/get-all-hubs', adminManager.get_all_hubs);
 
 /* This section contains APIs for providing details about resources owned by the user */
 app.post('/get-user-vSensors', userResoureMgr.get_vSensors);
