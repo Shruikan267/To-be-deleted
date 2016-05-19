@@ -8,6 +8,57 @@ var schedule = require('node-schedule');
 var myTimeout = 5000;
 var hub_list = [];
 
+function setDeleteFunction(sensor){
+	sensor.delete_sensor = function(callback){
+		
+		var options = {
+				host: sensor.sensor_host,
+				port: sensor.sensor_port,
+				path: '/delete',
+				method: 'POST',
+				headers: {
+				      'Content-Type': 'application/json',
+			  }
+		};
+		var data = {};
+		data.sensor_id = sensor.id;
+		
+		var request = http.request(options, function(response){
+			
+			var str = '';
+			response.on('data', function (chunk) {
+			   str += chunk;
+			});				
+			
+			response.on('end', function() {
+				str = JSON.parse(str);
+			    if(str && str.status ==="success"){
+			    	
+					callback({status : "success"});
+				}
+			});	
+			
+		});
+		
+		request.on('socket', function (socket) {
+		    socket.setTimeout(myTimeout);  
+		    socket.on('timeout', function() {		    	
+		    	request.abort();
+		        callback({status : "failed"});
+		    });
+		});
+
+		request.on('error', function(err) {
+		    if (err.code === "ECONNRESET") {
+		        console.log("Timeout occurs");
+		        //specific error treatment
+		    }		    
+		});
+		
+		request.write(JSON.stringify(data));
+		request.end();
+	};
+}
 
 setTimeout(function(){
 	mongo.read_hubs(function(result){
@@ -20,55 +71,8 @@ setTimeout(function(){
 					
 					var sensor = hub.sensors[j];
 					
-					sensor.delete_sensor = function(callback){
-						
-						var options = {
-								host: sensor.sensor_host,
-								port: sensor.sensor_port,
-								path: '/delete',
-								method: 'POST',
-								headers: {
-								      'Content-Type': 'application/json',
-							  }
-						};
-						var data = {};
-						data.sensor_id = sensor.id;
-						
-						var request = http.request(options, function(response){
-							
-							var str = '';
-							response.on('data', function (chunk) {
-							   str += chunk;
-							});				
-							
-							response.on('end', function() {
-								str = JSON.parse(str);
-							    if(str && str.status ==="success"){
-							    	
-									callback({status : "success"});
-								}
-							});	
-							
-						});
-						
-						request.on('socket', function (socket) {
-						    socket.setTimeout(myTimeout);  
-						    socket.on('timeout', function() {		    	
-						    	request.abort();
-						        callback({status : "failed"});
-						    });
-						});
-
-						request.on('error', function(err) {
-						    if (err.code === "ECONNRESET") {
-						        console.log("Timeout occurs");
-						        //specific error treatment
-						    }		    
-						});
-						
-						request.write(JSON.stringify(data));
-						request.end();
-					};
+					setDeleteFunction(sensor);
+					
 				}
 			}
 		}
@@ -208,6 +212,7 @@ exports.add_sensor = function(req, res){
 		}
 	}
 };
+
 
 exports.delete_sensor = function(req, res){
 	var hub_id = req.body.hub_id;

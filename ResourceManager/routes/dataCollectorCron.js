@@ -19,6 +19,41 @@ function getActiveSensors(callback){
 	});
 }
 
+function collect_data(options, data){
+	var request = http.request(options, function(response){
+		
+		var str = '';
+		response.on('data', function (chunk) {
+		   str += chunk;
+		});				
+		
+		response.on('end', function() {
+			str = JSON.parse(str);
+		    if(str && str.status ==="success"){
+		    	//do nothing
+			}
+		});	
+		
+	});
+	
+	request.on('socket', function (socket) {
+	    socket.setTimeout(myTimeout);  
+	    socket.on('timeout', function() {		    	
+	    	request.abort();
+	    });
+	});
+
+	request.on('error', function(err) {
+	    if (err.code === "ECONNRESET") {
+	        console.log("Timeout occurs");
+	        //specific error treatment
+	    }		    
+	});
+	
+	request.write(JSON.stringify(data));
+	request.end();
+}
+
 exports.runCron = function(){
 	var rule = new schedule.RecurrenceRule();
 	rule.second = [12,24,36,48,59];
@@ -47,41 +82,10 @@ exports.runCron = function(){
 						  }
 					};
 					
-					var request = http.request(options, function(response){
-						
-						var str = '';
-						response.on('data', function (chunk) {
-						   str += chunk;
-						});				
-						
-						response.on('end', function() {
-							str = JSON.parse(str);
-						    if(str && str.status ==="success"){
-						    	//do nothing
-							}
-						});	
-						
-					});
-					
-					request.on('socket', function (socket) {
-					    socket.setTimeout(myTimeout);  
-					    socket.on('timeout', function() {		    	
-					    	request.abort();
-					    });
-					});
-
-					request.on('error', function(err) {
-					    if (err.code === "ECONNRESET") {
-					        console.log("Timeout occurs");
-					        //specific error treatment
-					    }		    
-					});
-					
-					request.write(JSON.stringify(data));
-					request.end();				
+					collect_data(options, data);				
 				}
 			}
 		});
 	});
-}
+};
 
