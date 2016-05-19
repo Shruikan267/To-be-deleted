@@ -1,9 +1,9 @@
 var app = angular.module('vSensors', ['angularUtils.directives.dirPagination']);
-app.controller("vSensorController", vSensorController);
-vSensorController.$inject = [ '$scope', '$http', '$window'];
+//app.controller("vSensorController", vSensorController);
+//vSensorController.$inject = [ '$scope', '$http', '$window'];
 
-function vSensorController($scope, $http, $window) {
-	
+//function vSensorController($scope, $http, $window) {
+app.controller("vSensorController", function($scope, $http){
 	$scope.sensors = [];
 	$scope.physical_sensors = [];
 	$scope.sensor_data = [];
@@ -156,5 +156,5 @@ function vSensorController($scope, $http, $window) {
 		}
 		$scope.display_data = $scope.sensor_data[j].data;
 	};
-}
+});
 
