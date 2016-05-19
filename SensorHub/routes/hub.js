@@ -289,7 +289,9 @@ exports.get_data = function(req, res){
 			
 			for(var j=0, sensor_list_len=hub.sensors.length; j<sensor_list_len; j++){
 				var sensor = hub.sensors[j];
-				if(parseInt(sensor.id) === parseInt(sensor_id)){					
+				
+				if(parseInt(sensor.id) === parseInt(sensor_id)){	
+					
 					res.send({status:"success", data : sensor.data});
 					break;
 				}
@@ -298,6 +300,47 @@ exports.get_data = function(req, res){
 		}
 	}
 };
+
+function get_cron_data(options, sensor, hub_index, sensor_index){
+	var request = http.request(options, function(response){
+		
+		var str = '';
+		response.on('data', function (chunk) {
+		   str += chunk;
+		});				
+		
+		response.on('end', function() {
+			str = JSON.parse(str);
+		    if(str && str.status ==="success"){	
+		    	
+		    	sensor.data = str.data;
+		    	
+		    	hub_list[hub_index].sensors[sensor_index] = sensor;
+			}
+		  });				
+	});
+	
+	request.on('socket', function (socket) {
+	    socket.setTimeout(myTimeout);  
+	    socket.on('timeout', function() {		    	
+	    	request.abort();
+	    	console.log("timeout");
+	    });
+	});
+
+	request.on('error', function(err) {
+	    if (err.code === "ECONNRESET") {
+	        console.log("Timeout occurs");
+	        //specific error treatment
+	    }		    
+	});
+
+	
+	var data = {};
+	data.sensor_id = sensor.id;
+	request.write(JSON.stringify(data));
+	request.end();
+}
 
 
 var rule = new schedule.RecurrenceRule();
@@ -319,41 +362,10 @@ var j = schedule.scheduleJob(rule, function(){
 					}
 			};
 			
-			var request = http.request(options, function(response){
-				
-				var str = '';
-				response.on('data', function (chunk) {
-				   str += chunk;
-				});				
-				
-				response.on('end', function() {
-					str = JSON.parse(str);
-				    if(str && str.status ==="success"){
-				    	sensor.data = str.data;						
-					}
-				  });				
-			});
+			get_cron_data(options, sensor, i, j);
 			
-			request.on('socket', function (socket) {
-			    socket.setTimeout(myTimeout);  
-			    socket.on('timeout', function() {		    	
-			    	request.abort();
-			        callback({status : "failed"});
-			    });
-			});
-
-			request.on('error', function(err) {
-			    if (err.code === "ECONNRESET") {
-			        console.log("Timeout occurs");
-			        //specific error treatment
-			    }		    
-			});
-
-			
-			var data = {};
-			data.sensor_id = sensor.id;
-			request.write(JSON.stringify(data));
-			request.end();
 		}		
 	}
 });
+
+

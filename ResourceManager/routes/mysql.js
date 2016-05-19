@@ -25,7 +25,6 @@ function executeQuery(sqlQuery, callback) {
 			if (err) {
 				console.log(err.message);
 			} else {
-				console.log("DB Data:" + rows);
 				callback(err, rows);
 			}
 			

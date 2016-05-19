@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Devices</title>
+
+<link href="css/bootstrap.min.css" rel="stylesheet">
+<link href="css/datepicker3.css" rel="stylesheet">
+<link href="css/styles.css" rel="stylesheet">
+
+<!--Icons-->
+<script src="js/lumino.glyphs.js"></script>
+<script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/angularjs/1.0.7/angular.min.js"></script>
+<script src="controllers/device-controller.js"></script>
+<!--[if lt IE 9]>
+<script src="js/html5shiv.js"></script>
+<script src="js/respond.min.js"></script>
+<![endif]-->
+
+</head>
+
+<body ng-app="devices" ng-controller="deviceController">
+	<nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+		<div class="container-fluid">
+			<div class="navbar-header">
+				<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#sidebar-collapse">
+					<span class="sr-only">Toggle navigation</span>
+					<span class="icon-bar"></span>
+					<span class="icon-bar"></span>
+					<span class="icon-bar"></span>
+				</button>
+				<a class="navbar-brand" href="#"><span>Sensor</span>Cloud</a>
+				<ul class="user-menu">
+					<li class="dropdown pull-right">
+						<a href="#" class="dropdown-toggle" data-toggle="dropdown"><svg class="glyph stroked male-user"><use xlink:href="#stroked-male-user"></use></svg> User <span class="caret"></span></a>
+						<ul class="dropdown-menu" role="menu">
+							<li><a href="#"><svg class="glyph stroked male-user"><use xlink:href="#stroked-male-user"></use></svg> Profile</a></li>
+							<li><a href="#"><svg class="glyph stroked gear"><use xlink:href="#stroked-gear"></use></svg> Settings</a></li>
+							<li><a href="/logout"><svg class="glyph stroked cancel"><use xlink:href="#stroked-cancel"></use></svg> Logout</a></li>
+						</ul>
+					</li>
+				</ul>
+			</div>
+							
+		</div><!-- /.container-fluid -->
+	</nav>
+		
+	<div id="sidebar-collapse" class="col-sm-3 col-lg-2 sidebar">
+		<form role="search">
+			<div class="form-group">
+				<input type="text" class="form-control" placeholder="Search">
+			</div>
+		</form>
+		<ul class="nav menu">
+			<li><a href="/index"><svg class="glyph stroked dashboard-dial"><use xlink:href="#stroked-dashboard-dial"></use></svg> Dashboard</a></li>
+			<li><a href="/sensors"><svg class="glyph stroked calendar"><use xlink:href="#stroked-calendar"></use></svg> Sensors</a></li>
+			<li class="active"><a href="/devices"><svg class="glyph stroked star"><use xlink:href="#stroked-star"></use></svg> Physical Devices</a></li>
+			
+			<li role="presentation" class="divider"></li>
+			<li><a href="/logout"><svg class="glyph stroked male-user"><use xlink:href="#stroked-male-user"></use></svg> Logout</a></li>
+		</ul>
+
+	</div><!--/.sidebar-->
+		
+	<div class="col-sm-9 col-sm-offset-3 col-lg-10 col-lg-offset-2 main">			
+		<div class="row">
+			<ol class="breadcrumb">
+				<li><a href="/index"><svg class="glyph stroked home"><use xlink:href="#stroked-home"></use></svg></a></li>
+				<li class="active">Devices</li>
+			</ol>
+		</div><!--/.row-->
+		
+		<div class="row">
+			<div class="col-lg-12">
+				<h1 class="page-header">Devices - Hubs and Physical Sensors</h1>
+			</div>
+		</div><!--/.row-->	
+		
+		<div class="row">
+			<div class="col-lg-12">
+				<div class="panel panel-default" style="min-height:600px;">
+					<div class="panel-heading">Devices Overview</div>
+					<div class="panel-body">
+						<div class="row">
+							<div class="col-md-4">
+								<button class="btn btn-primary" style="margin-bottom:10px;" data-toggle="modal" data-target="#myModal">Add Hub</button>
+							</div>
+						</div>
+						<div class="row">
+							
+							<div class="col-md-12" >
+								<table width="100%" style="text-align:center;" border="1">
+									<tr >
+										<th style="text-align:center;">Hub Name</th>
+										
+										<th colspan="2" style="text-align:center;">Actions</th>
+									</tr>
+									<tr ng-repeat="hub in hubs">
+										<td>{{hub.hub_name}}</td>
+									
+										<td style="padding:3px;"><button class="btn btn-primary" ng-click="view_sensor($index)">View Sensors</button></td>
+										<td><button class="btn btn-primary btn-danger" ng-click="delete_hub($index)">Delete</button></td>
+									</tr>
+								</table>
+							</div>
+						</div>
+						<br>
+						<br>
+						<br>
+						<br>
+						<button class="btn btn-primary" style="margin-bottom:10px; margin-left:0px;" data-toggle="modal" data-target="#myModal2">Add Sensor</button>
+						<div class="row">
+						
+							<div class="col-md-12">
+							<table border="1" width="100%" style="text-align:center;">
+							<tr>
+								<th width="30%" style="text-align:center;">Sensor Name</th>
+								<th width="30%" style="text-align:center;">Sensor State</th>
+								<th style="text-align:center;" colspan = "2">Actions</th>
+							</tr>
+							<tr ng-repeat = "sensor in visible_sensors">
+								<td>{{sensor.sensor_name}}</td>
+								<td>{{sensor.state}}</td>
+								<td style="text-align:center; padding:3px;" colspan="2"><button class="btn btn-primary btn-danger" ng-click="delete_sensor($index)">Delete Sensor</button></td>
+								
+							</tr>
+							</table>
+							</div>
+						</div>
+						
+						<!-- <div class="canvas-wrapper">
+							<div id="chart-container" style="border-radius:7px; box-shadow: 10px 7px 5px #888888; width:90%; height:80%;"></div>
+						</div> -->
+					</div>
+				</div>
+			</div>
+		</div><!--/.row-->
+		
+		
+							
+	</div>	<!--/.main-->
+
+	<script src="js/jquery-1.11.1.min.js"></script>
+	<script src="js/bootstrap.min.js"></script>
+	<script>
+
+
+		!function ($) {
+		    $(document).on("click","ul.nav li.parent > a > span.icon", function(){          
+		        $(this).find('em:first').toggleClass("glyphicon-minus");      
+		    }); 
+		    $(".sidebar span.icon").find('em:first').addClass("glyphicon-plus");
+		}(window.jQuery);
+
+		$(window).on('resize', function () {
+		  if ($(window).width() > 768) $('#sidebar-collapse').collapse('show')
+		})
+		$(window).on('resize', function () {
+		  if ($(window).width() <= 767) $('#sidebar-collapse').collapse('hide')
+		})
+		
+		function create_hub(){
+			var hub_name = document.getElementById("hub_name").value;
+			
+			$.post("/create-hub",
+				    {
+						hub_name: hub_name				        
+				    },
+				    function(data, status){
+				        console.log("Data: " + data + "\nStatus: " + status);
+				        window.location.href='/devices';
+				    });
+			
+		}
+		
+		function create_sensor(){
+			var sensor_name = document.getElementById("modal_sensor_name").value;
+			var hub_id = document.getElementById("selectedHub").value;
+			
+			//var data = {
+				//	sensor_name : sensor_name,
+					//hub_id : hub_id
+			//}
+			
+			
+			$.post("/create-physical-sensor",{
+						sensor_name : sensor_name,
+						hub_id : hub_id				        
+				    },
+				    function(data, status){
+				        console.log("Data: " + data + "\nStatus: " + status);
+				        window.location.href='/devices';
+		    });
+			
+		}
+	</script>
+
+
+	<div id="myModal" class="modal fade" tabindex="-1" role="dialog">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal"
+						aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					</button>
+					<h4 class="modal-title">Add hub</h4>
+				</div>
+				<div class="modal-body">
+					Hub Name : <input type="text" id = "hub_name">
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+					<button type="button" class="btn btn-primary" data-dismiss="modal" onclick="create_hub()">Create Hub</button>
+				</div>
+			</div>
+			<!-- /.modal-content -->
+		</div>
+		<!-- /.modal-dialog -->
+	</div>
+	<!-- /.modal -->
+	
+	<input id="selectedHubIndex" type="hidden" value="">
+	<input id="selectedHub" type="hidden" value="">
+	
+	<div id="myModal2" class="modal fade" tabindex="-1" role="dialog">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal"
+						aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					</button>
+					<h4 class="modal-title">Add Sensor</h4>
+				</div>
+				<div class="modal-body">
+					Sensor Name : <input type="text" id = "modal_sensor_name">
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+					<button type="button" class="btn btn-primary" data-dismiss="modal" onclick="create_sensor()">Create Sensor</button>
+				</div>
+			</div>
+			<!-- /.modal-content -->
+		</div>
+		<!-- /.modal-dialog -->
+	</div>
+	<!-- /.modal -->
+
+</body>
+
+</html>

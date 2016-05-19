@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Forms</title>
+
+<link href="css/bootstrap.min.css" rel="stylesheet">
+<link href="css/datepicker3.css" rel="stylesheet">
+<link href="css/styles.css" rel="stylesheet">
+
+
+<script>
+
+function submit_register(){
+	var email = document.getElementById("email");
+	var password = document.getElementById("password");
+	var data = {
+		email : email,
+		password : password
+	};
+	
+	$.post( "/sign-up", function( data ) {
+		if(data.status === "success"){
+			window.location.href = "/index";	
+		}else{
+			alert('invalid credentials');
+		}	
+	});
+}
+
+</script>
+
+<!--[if lt IE 9]>
+<script src="js/html5shiv.js"></script>
+<script src="js/respond.min.js"></script>
+<![endif]-->
+
+</head>
+
+<body>
+	
+	<div class="row">
+		<div class="col-xs-10 col-xs-offset-1 col-sm-8 col-sm-offset-2 col-md-4 col-md-offset-4">
+			<div class="login-panel panel panel-default">
+				<div class="panel-heading">Register</div>
+				<div class="panel-body">
+					<form role="form">
+						<fieldset>						
+							<div class="form-group">
+								<input id="user-name" class="form-control" placeholder="User Id" name="user-name" type="text" value="">
+							</div>
+							<div class="form-group">
+								<input id="email" class="form-control" placeholder="E-mail" name="email" type="email" autofocus="">
+							</div>
+							<div class="form-group">
+								<input id="password" class="form-control" placeholder="Password" name="password" type="password" value="">
+							</div>
+							<div class="form-group">
+								<input id="first-name" class="form-control" placeholder="First Name" name="first-name" type="text" value="">
+							</div>
+							<div class="form-group">
+								<input id="last-name" class="form-control" placeholder="Last Name" name="last-name" type="text" value="">
+							</div>
+							<a onclick="submit_register()" class="btn btn-primary">Register</a>
+							<a href="/login" class="btn btn-primary">Back to login page</a>
+						</fieldset>
+					</form>
+				</div>
+			</div>
+		</div><!-- /.col-->
+	</div><!-- /.row -->	
+	
+		
+
+	<script src="js/jquery-1.11.1.min.js"></script>
+	<script src="js/bootstrap.min.js"></script>
+	<script>
+		!function ($) {
+			$(document).on("click","ul.nav li.parent > a > span.icon", function(){		  
+				$(this).find('em:first').toggleClass("glyphicon-minus");	  
+			}); 
+			$(".sidebar span.icon").find('em:first').addClass("glyphicon-plus");
+		}(window.jQuery);
+
+		$(window).on('resize', function () {
+		  if ($(window).width() > 768) $('#sidebar-collapse').collapse('show')
+		})
+		$(window).on('resize', function () {
+		  if ($(window).width() <= 767) $('#sidebar-collapse').collapse('hide')
+		})
+	</script>	
+</body>
+
+</html>

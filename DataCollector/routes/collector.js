@@ -23,6 +23,7 @@ exports.collect_data = function(req, res){
 			sensor_data.user_id = vSensor_details.user_id;
 			mongo.save_data(sensor_data, function(result){
 				if(result.status === "success"){
+					console.log("saved");
 					res.send({status : "success"});
 				}else{
 					res.send({status : "failed"});

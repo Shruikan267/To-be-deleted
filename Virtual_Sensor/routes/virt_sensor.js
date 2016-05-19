@@ -178,10 +178,8 @@ exports.start_sensor = function(req, res){
 
 exports.get_data = function(req,res){
 	var vSensor_id = req.body.sensor_id;
-	console.log(vSensor_id);
 	for(var i=0, len=vSensor_list.length; i<len; i++){
 		if(parseInt(vSensor_list[i].id) === parseInt(vSensor_id)){
-			console.log('sensor found');
 			res.send({status : "success", data : vSensor_list[i].data});
 			break;
 		}
@@ -240,7 +238,8 @@ var j = schedule.scheduleJob(rule, function(){
 			    	if(vSensor.pollutants.n2o){
 			    		sensor_data.n2o = str.data.n2o;
 			    	}
-			    	vSensor.data = sensor_data;
+			    	vSensor.data = str.data;
+			    	console.log(str);
 			    	
 			    	mongo.update_sensor(vSensor, function(update_result){
 						if(update_result.status==="success"){							
@@ -271,5 +270,92 @@ var j = schedule.scheduleJob(rule, function(){
 		request.write(JSON.stringify(data));
 		request.end();
 				
+	}
+});
+
+var rule = new schedule.RecurrenceRule();
+rule.second = [10,20,30,40,50,59];
+
+var j = schedule.scheduleJob(rule, function(){
+	for(var i=0, len=vSensor_list.length; i<len; i++){
+		if(vSensor_list[i].state === "Running"){
+			var pSensorDetails = vSensor_list[i].pSensorDetails;
+			var vSensor = vSensor_list[i];
+			var options = {
+					host: pSensorDetails.hub_host,
+					port: pSensorDetails.hub_port,
+					path: '/get-data',
+					method: 'POST',
+					headers: {
+					      'Content-Type': 'application/json',
+				  }
+			};
+			var data = {};
+			data.sensor_id = pSensorDetails.pSensor_id;
+			data.hub_id = pSensorDetails.hub_id;
+			
+			var request = http.request(options, function(response){
+				
+				var str = '';
+				response.on('data', function (chunk) {
+				   str += chunk;
+				});				
+				
+				response.on('end', function() {
+					str = JSON.parse(str);
+				    if(str && str.status ==="success"){
+				    	
+				    	var sensor_data = {};
+				    	if(vSensor.pollutants.ozone){
+				    		sensor_data.ozone = str.data.ozone;
+				    	}
+				    	if(vSensor.pollutants.co){
+				    		sensor_data.co = str.data.co;
+				    	}
+				    	if(vSensor.pollutants.so2){
+				    		sensor_data.so2 = str.data.so2;
+				    	}
+				    	if(vSensor.pollutants.ppm){
+				    		sensor_data.ppm = str.data.ppm;
+				    	}
+				    	if(vSensor.pollutants.n2o){
+				    		sensor_data.n2o = str.data.n2o;
+				    	}
+				    	vSensor.data = sensor_data;
+				    	
+				    	mongo.update_sensor(vSensor, function(update_result){
+							if(update_result.status==="success"){
+							}else{							
+								console.log(update_result.error);
+							}
+						});
+				    	
+				    	
+					}
+				});	
+				
+			});
+			
+			request.on('socket', function (socket) {
+			    socket.setTimeout(myTimeout);  
+			    socket.on('timeout', function() {		    	
+			    	request.abort();
+			    	console.log('failed');
+			    });
+			});
+
+			request.on('error', function(err) {
+			    if (err.code === "ECONNRESET") {
+			        console.log("Timeout occurs");
+			        //specific error treatment
+			    }		    
+			});
+			
+			request.write(JSON.stringify(data));
+			
+			request.end();
+			
+			
+		}
 	}
 });

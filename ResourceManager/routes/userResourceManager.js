@@ -6,7 +6,6 @@ function get_user_vSensors(user_id, callback){
 	
 	mysql.executeQuery(sqlQuery, function(err, rows){
 		if(!err){
-			console.log(rows);
 			callback({status : "success", rows : rows});
 		}else{
 			console.log(err);

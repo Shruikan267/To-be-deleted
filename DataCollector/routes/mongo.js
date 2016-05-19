@@ -1,5 +1,5 @@
 var MongoClient = require('mongodb').MongoClient;
-var url = 'mongodb://52.39.177.195:27017/sensorcloud';
+var url = 'mongodb://52.38.52.92:27017/sensorcloud';
 
 var db;
 MongoClient.connect(url, function(err, database) {
@@ -18,6 +18,7 @@ exports.save_data = function(sensor_data, callback){
 	
 	db.collection('sensor_data').insertOne({id : id, user_id : user_id, data : data, time : time}, function(err,r){
 		if(!err){
+			console.log(r);
 			callback({status : "success"});
 		}else{
 			console.log(err);
